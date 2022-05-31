@@ -16,6 +16,11 @@
     <color name="gray2">#EEEEEE</color>
     <color name="gray3">#6D757D</color>
     <color name="gray4">#D8D8D8</color>
+    <color name="gray5">#D5D6D8</color>
+    <color name="gray6">#F5F6F8</color>
+
+    // Gray Blue
+    <color name="grayBlue1">#EEF6F9</color>
 
     // Yellow
     <color name="yellow1">#FFC009</color>
@@ -26,6 +31,8 @@
     // Blue
     <color name="blue1">#037BFF</color>
     <color name="blue2">#13A2B8</color>
+    <color name="blue3">#4F94F8</color>
+    <color name="blue4">#5497B5</color>
 
     <color name="textColor1">#575962</color>
     <color name="textColor2">#777777</color>
