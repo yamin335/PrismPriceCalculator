@@ -13,7 +13,8 @@ data class ModuleGroup (
     val dependencies: List<Any?>,
     val multipliers: List<MultiplierClass>,
     val showMultiplier: String? = null,
-    val description: String? = null
+    val description: String? = null,
+    var isExpanded: Boolean = false
 )
 
 data class ServiceModule (
@@ -42,7 +43,7 @@ data class Feature (
 data class SubModule (
     val name: String,
     val code: String,
-    val features: List<SubModule>? = null,
+    val features: List<Feature>? = null,
     val description: String? = null,
     val dependencies: List<Any?>,
     val price: Price? = null

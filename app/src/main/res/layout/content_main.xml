@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/app_bar_main"
+    tools:context=".MainActivity">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:background="@drawable/rounded_rectangle_blue_1"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="10dp"
+                    android:paddingTop="8dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Licensing Parameters"
+                        android:textColor="@color/textColor1"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/logout"
+                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:backgroundTint="@color/blue1"
+                        android:text="Save Changes"
+                        android:textAllCaps="false"
+                        android:windowSoftInputMode="adjustResize"
+                        app:cornerRadius="5dp" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
+                    android:background="@color/gray4" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Accounts"
+                    android:textColor="@color/textColor1" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleButtonAccounts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    app:checkedButton="@id/accountSmall"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/accountSmall"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Small (1-400)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/accountMedium"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Medium (401-800)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/accountLarge"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Large (801-1200)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Customers"
+                    android:textColor="@color/textColor1" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleButtonCustomers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    app:checkedButton="@id/customerSmall"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/customerSmall"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Small (1-500)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/customerMedium"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Medium (501-2000)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/customerLarge"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Large (2001-5000)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Vendors"
+                    android:textColor="@color/textColor1" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleButtonVendors"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    app:checkedButton="@id/vendorSmall"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/vendorSmall"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Small (1-500)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/vendorMedium"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Medium (501-2000)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/vendorLarge"
+                        style="@style/Widget.App.Button.ToggleGroupButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/toggle_button_background_state_colors"
+                        android:text="Large (2001-5000)"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        app:rippleColor="@color/white" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:clipToPadding="false"
+                android:paddingBottom="150dp"
+                android:paddingTop="5dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include layout="@layout/service_selection_summary_bottom_sheet"
+        android:id="@+id/summarySheet"/>
+
+    <net.store.divineit.utils.ShadowView
+        android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:gravity="bottom"
+        app:layout_anchor="@id/summarySheet" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

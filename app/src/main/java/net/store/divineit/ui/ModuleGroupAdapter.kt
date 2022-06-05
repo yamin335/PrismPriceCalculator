@@ -1,22 +1,21 @@
 package net.store.divineit.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import net.store.divineit.R
-import net.store.divineit.databinding.FinancialServiceListItemBinding
-import net.store.divineit.models.FinancialService
+import net.store.divineit.databinding.ModuleGroupListItemBinding
+import net.store.divineit.models.ModuleGroup
 
-class FinancialServiceListAdapter internal constructor(
-    private val callback: (FinancialService) -> Unit
-) : RecyclerView.Adapter<FinancialServiceListAdapter.ViewHolder>() {
+class ModuleGroupAdapter internal constructor(
+    private val callback: (ModuleGroup) -> Unit
+) : RecyclerView.Adapter<ModuleGroupAdapter.ViewHolder>() {
 
-    private var dataList: ArrayList<FinancialService> = ArrayList()
+    private var dataList: ArrayList<ModuleGroup> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding: FinancialServiceListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_financial_service, parent, false)
+        val binding: ModuleGroupListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_module_group, parent, false)
         return ViewHolder(binding)
     }
 
@@ -28,17 +27,18 @@ class FinancialServiceListAdapter internal constructor(
         return dataList.size
     }
 
-    fun submitList(dataList: List<FinancialService>) {
-        this.dataList = dataList  as ArrayList<FinancialService>
+    fun submitList(dataList: List<ModuleGroup>) {
+        this.dataList = dataList  as ArrayList<ModuleGroup>
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(private val binding: FinancialServiceListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: ModuleGroupListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             val item = dataList[position]
             binding.item = item
 
-            binding.numberOfModules.text = "${item.numberOfModules} modules"
+            val numberOfModuleText = "${item.modules.size} modules"
+            binding.numberOfModules.text = numberOfModuleText
 
             binding.expandableLayout.isExpanded = item.isExpanded
 
@@ -47,17 +47,17 @@ class FinancialServiceListAdapter internal constructor(
                 binding.expandableLayout.isExpanded = item.isExpanded
             }
 
-            val listDetailsAdapter = FinancialServiceDetailsAdapter {
+            val moduleListAdapter = ModuleListAdapter {
 
             }
 
-            binding.details.setHasFixedSize(true)
+            binding.recyclerModule.setHasFixedSize(true)
 
-            binding.details.adapter = listDetailsAdapter
-            listDetailsAdapter.submitList(item.details)
+            binding.recyclerModule.adapter = moduleListAdapter
+            moduleListAdapter.submitList(item.modules)
         }
 
-        private fun toggleExpanded(item: FinancialService, binding: FinancialServiceListItemBinding) {
+        private fun toggleExpanded(item: ModuleGroup, binding: ModuleGroupListItemBinding) {
             item.isExpanded = !item.isExpanded
             if (item.isExpanded) {
                 binding.arrowClickToShow.animate().setDuration(200).rotation(180F)

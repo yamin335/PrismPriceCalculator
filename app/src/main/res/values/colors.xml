@@ -11,6 +11,9 @@
     // Custom colors
     <color name="transparent">#00000000</color>
 
+    // Theme Color
+    <color name="themeColor">#4F94F8</color>
+
     // Gray
     <color name="gray1">#F7F7F7</color>
     <color name="gray2">#EEEEEE</color>
@@ -36,4 +39,6 @@
 
     <color name="textColor1">#575962</color>
     <color name="textColor2">#777777</color>
+    <color name="textColor3">#404040</color>
+    <color name="textColor4">#999999</color>
 </resources>
