@@ -140,14 +140,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:el_duration="500"
-                app:el_expanded="true"
+                app:el_expanded="false"
                 app:el_parallax="0.0">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerModule"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="4"
                     tools:listitem="@layout/list_item_module"
                     android:visibility="visible"/>

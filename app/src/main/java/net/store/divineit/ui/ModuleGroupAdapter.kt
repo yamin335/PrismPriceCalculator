@@ -3,6 +3,7 @@ package net.store.divineit.ui
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import net.store.divineit.R
 import net.store.divineit.databinding.ModuleGroupListItemBinding
@@ -50,10 +51,15 @@ class ModuleGroupAdapter internal constructor(
             val moduleListAdapter = ModuleListAdapter {
 
             }
+            val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+            innerLLM.initialPrefetchItemCount = 3
 
-            binding.recyclerModule.setHasFixedSize(true)
-
-            binding.recyclerModule.adapter = moduleListAdapter
+            binding.recyclerModule.apply {
+                isNestedScrollingEnabled = false
+                setHasFixedSize(true)
+                layoutManager = innerLLM
+                adapter = moduleListAdapter
+            }
             moduleListAdapter.submitList(item.modules)
         }
 

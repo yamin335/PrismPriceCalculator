@@ -10,7 +10,7 @@
     android:clickable="true"
     style="?attr/bottomSheetStyle"
     app:behavior_hideable="false"
-    app:behavior_peekHeight="130dp"
+    app:behavior_peekHeight="100dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
     android:animateLayoutChanges="true">
 

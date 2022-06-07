@@ -1,15 +1,20 @@
 package net.store.divineit
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.store.divineit.databinding.ActivityMainBinding
 import net.store.divineit.models.BaseServiceModule
 import net.store.divineit.models.FinancialService
@@ -24,7 +29,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var summarySheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var baseServiceAdapter: BaseServiceModuleListAdapter
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
+    private lateinit var mDetector: GestureDetector
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -33,6 +40,16 @@ class MainActivity : AppCompatActivity() {
         //ViewCompat.setLayoutDirection(binding.appBarMain.toolbar, ViewCompat.LAYOUT_DIRECTION_RTL)
 
         setSupportActionBar(binding.appBarMain.toolbar)
+        mDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent?): Boolean {
+                if(summarySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                    summarySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                } else {
+                    summarySheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+                return true
+            }
+        })
 
         mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar, R.string.open, R.string.close) {
             override fun onDrawerClosed(drawerView: View) {
@@ -60,8 +77,11 @@ class MainActivity : AppCompatActivity() {
         val baseModuleList = Gson().fromJson(jsonString, Array<BaseServiceModule>::class.java).toList()
 
         baseServiceAdapter = BaseServiceModuleListAdapter {
-            moduleGroupAdapter.submitList(it.moduleGroups)
             binding.drawerLayout.closeDrawer(GravityCompat.END)
+            CoroutineScope(Dispatchers.Main.immediate).launch {
+                delay(250)
+                moduleGroupAdapter.submitList(it.moduleGroups)
+            }
         }
         baseServiceAdapter.submitList(baseModuleList)
         binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
@@ -74,6 +94,10 @@ class MainActivity : AppCompatActivity() {
             } else {
                 summarySheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
+        }
+
+        binding.appBarMain.contentMain.summarySheet.summarySheetRootView.setOnTouchListener { _, motionEvent ->
+            return@setOnTouchListener mDetector.onTouchEvent(motionEvent)
         }
 
         summarySheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -97,10 +121,15 @@ class MainActivity : AppCompatActivity() {
         moduleGroupAdapter = ModuleGroupAdapter {
 
         }
+        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+        innerLLM.initialPrefetchItemCount = 3
 
-        binding.appBarMain.contentMain.recyclerView.adapter = moduleGroupAdapter
-
-        binding.appBarMain.contentMain.recyclerView.setHasFixedSize(true)
+        binding.appBarMain.contentMain.recyclerView.apply {
+            isNestedScrollingEnabled = false
+            setHasFixedSize(true)
+            layoutManager = innerLLM
+            adapter = moduleGroupAdapter
+        }
 
         if (baseModuleList.isNotEmpty()) {
             moduleGroupAdapter.submitList(baseModuleList[0].moduleGroups)
