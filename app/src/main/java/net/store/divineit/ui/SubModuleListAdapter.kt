@@ -7,14 +7,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import net.store.divineit.R
 import net.store.divineit.databinding.SubModuleListItemBinding
+import net.store.divineit.models.Feature
 import net.store.divineit.models.SubModule
 import net.store.divineit.utils.toShortForm
 
 class SubModuleListAdapter internal constructor(
+    private var dataList: List<SubModule>,
     private val callback: (SubModule) -> Unit
 ) : RecyclerView.Adapter<SubModuleListAdapter.ViewHolder>() {
-
-    private var dataList: ArrayList<SubModule> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding: SubModuleListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_sub_module, parent, false)
@@ -39,8 +39,8 @@ class SubModuleListAdapter internal constructor(
             val item = dataList[position]
             binding.item = item
 
-            val featureListAdapter = FeatureListAdapter {
-
+            val featureListAdapter = FeatureListAdapter(dataList[position].features ?: ArrayList()) {
+                callback(dataList[position])
             }
 
             val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
@@ -52,7 +52,7 @@ class SubModuleListAdapter internal constructor(
                 layoutManager = innerLLM
                 adapter = featureListAdapter
             }
-            featureListAdapter.submitList(item.features ?: ArrayList())
+            //featureListAdapter.submitList(item.features ?: ArrayList())
         }
     }
 }

@@ -10,10 +10,9 @@ import net.store.divineit.databinding.BaseServiceModuleListItemBinding
 import net.store.divineit.models.BaseServiceModule
 
 class BaseServiceModuleListAdapter internal constructor(
-    private val callback: (BaseServiceModule) -> Unit
+    private var dataList: List<BaseServiceModule>,
+    private val callback: (BaseServiceModule, Int) -> Unit
 ) : RecyclerView.Adapter<BaseServiceModuleListAdapter.ViewHolder>() {
-
-    private var dataList: List<BaseServiceModule> = ArrayList()
     private var selectedItemPosition = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,7 +41,7 @@ class BaseServiceModuleListAdapter internal constructor(
             binding.root.setOnClickListener {
                 val previousPosition = selectedItemPosition
                 selectedItemPosition = position
-                callback(item)
+                callback(dataList[position], position)
                 notifyItemChanged(previousPosition)
                 notifyItemChanged(selectedItemPosition)
             }

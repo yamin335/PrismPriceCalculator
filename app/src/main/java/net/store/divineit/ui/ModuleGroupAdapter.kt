@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import net.store.divineit.R
 import net.store.divineit.databinding.ModuleGroupListItemBinding
+import net.store.divineit.models.Feature
 import net.store.divineit.models.ModuleGroup
 
 class ModuleGroupAdapter internal constructor(
+    private var dataList: List<ModuleGroup>,
     private val callback: (ModuleGroup) -> Unit
 ) : RecyclerView.Adapter<ModuleGroupAdapter.ViewHolder>() {
-
-    private var dataList: ArrayList<ModuleGroup> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding: ModuleGroupListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_module_group, parent, false)
@@ -48,8 +48,8 @@ class ModuleGroupAdapter internal constructor(
                 binding.expandableLayout.isExpanded = item.isExpanded
             }
 
-            val moduleListAdapter = ModuleListAdapter {
-
+            val moduleListAdapter = ModuleListAdapter(dataList[position].modules) {
+                callback(dataList[position])
             }
             val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
             innerLLM.initialPrefetchItemCount = 3
@@ -60,7 +60,7 @@ class ModuleGroupAdapter internal constructor(
                 layoutManager = innerLLM
                 adapter = moduleListAdapter
             }
-            moduleListAdapter.submitList(item.modules)
+            //moduleListAdapter.submitList(item.modules)
         }
 
         private fun toggleExpanded(item: ModuleGroup, binding: ModuleGroupListItemBinding) {

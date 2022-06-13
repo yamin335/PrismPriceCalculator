@@ -1,12 +1,11 @@
 package net.store.divineit
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -17,9 +16,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.store.divineit.databinding.ActivityMainBinding
 import net.store.divineit.models.BaseServiceModule
-import net.store.divineit.models.FinancialService
+import net.store.divineit.models.ModuleGroupSummary
 import net.store.divineit.ui.BaseServiceModuleListAdapter
 import net.store.divineit.ui.ModuleGroupAdapter
+import net.store.divineit.ui.ModuleGroupSummaryListAdapter
 import java.io.*
 
 
@@ -30,6 +30,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var baseServiceAdapter: BaseServiceModuleListAdapter
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
     private lateinit var mDetector: GestureDetector
+    private lateinit var moduleSummaryAdapter: ModuleGroupSummaryListAdapter
+    private var selectedBaseModulePosition = 0
+    private lateinit var baseModuleList: List<BaseServiceModule>
+    private var summaryMap: HashMap<String, ModuleGroupSummary> = HashMap()
+    private val baseTotal = 190000
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +45,10 @@ class MainActivity : AppCompatActivity() {
         //ViewCompat.setLayoutDirection(binding.appBarMain.toolbar, ViewCompat.LAYOUT_DIRECTION_RTL)
 
         setSupportActionBar(binding.appBarMain.toolbar)
+
+        val totalText = "৳$baseTotal"
+        binding.appBarMain.contentMain.summarySheet.total.text = totalText
+
         mDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent?): Boolean {
                 if(summarySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
@@ -74,13 +83,38 @@ class MainActivity : AppCompatActivity() {
         }
 
         val jsonString: String = writer.toString()
-        val baseModuleList = Gson().fromJson(jsonString, Array<BaseServiceModule>::class.java).toList()
+        baseModuleList = Gson().fromJson(jsonString, Array<BaseServiceModule>::class.java).toList()
 
-        baseServiceAdapter = BaseServiceModuleListAdapter {
+        if (baseModuleList.isEmpty()) return
+
+        moduleSummaryAdapter = ModuleGroupSummaryListAdapter()
+        binding.appBarMain.contentMain.summarySheet.recyclerSummary.adapter = moduleSummaryAdapter
+
+        moduleGroupAdapter = ModuleGroupAdapter(baseModuleList[0].moduleGroups) {
+            calculateSummary()
+        }
+
+        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+        innerLLM.initialPrefetchItemCount = 3
+
+        binding.appBarMain.contentMain.recyclerView.apply {
+            isNestedScrollingEnabled = false
+            setHasFixedSize(true)
+            layoutManager = innerLLM
+            adapter = moduleGroupAdapter
+        }
+
+        baseServiceAdapter = BaseServiceModuleListAdapter(baseModuleList) { baseModule, position ->
+            selectedBaseModulePosition = position
             binding.drawerLayout.closeDrawer(GravityCompat.END)
             CoroutineScope(Dispatchers.Main.immediate).launch {
                 delay(250)
-                moduleGroupAdapter.submitList(it.moduleGroups)
+                moduleGroupAdapter = ModuleGroupAdapter(baseModule.moduleGroups) {
+                    calculateSummary()
+                }
+                binding.appBarMain.contentMain.recyclerView.apply {
+                    adapter = moduleGroupAdapter
+                }
             }
         }
         baseServiceAdapter.submitList(baseModuleList)
@@ -101,7 +135,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         summarySheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 // Do something for new state.
                 if(newState == BottomSheetBehavior.STATE_EXPANDED) {
@@ -117,23 +150,78 @@ class MainActivity : AppCompatActivity() {
                 // Do something for slide offset.
             }
         })
+    }
 
-        moduleGroupAdapter = ModuleGroupAdapter {
+    private fun calculateSummary() {
+        val baseModule = baseModuleList[selectedBaseModulePosition]
+        var isAdded = false
+        var price = 0
+        for (moduleGroup in baseModule.moduleGroups) {
+            val modules = moduleGroup.modules
 
+            for (module in modules) {
+                if (module.isAdded) {
+                    val slab1 = module.price?.slab1
+                    if (slab1 != null) {
+                        try {
+                            price += slab1.toInt()
+                        } catch (e: Exception) {
+                            continue
+                        }
+                    }
+                    isAdded = true
+                }
+
+                for (feature in module.features) {
+                    if (feature.isAdded) {
+                        val slab1 = feature.price?.slab1
+                        if (slab1 != null) {
+                            try {
+                                price += slab1.toInt()
+                            } catch (e: Exception) {
+                                continue
+                            }
+                        }
+                        isAdded = true
+                    }
+                }
+
+                for (subModule in module.submodules) {
+                    val features = subModule.features ?: continue
+                    for (feature in features) {
+                        if (feature.isAdded) {
+                            val slab1 = feature.price?.slab1
+                            if (slab1 != null) {
+                                try {
+                                    price += slab1.toInt()
+                                } catch (e: Exception) {
+                                    continue
+                                }
+                            }
+                            isAdded = true
+                        }
+                    }
+                }
+            }
         }
-        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-        innerLLM.initialPrefetchItemCount = 3
 
-        binding.appBarMain.contentMain.recyclerView.apply {
-            isNestedScrollingEnabled = false
-            setHasFixedSize(true)
-            layoutManager = innerLLM
-            adapter = moduleGroupAdapter
+        if (isAdded) {
+            summaryMap[baseModule.code] = ModuleGroupSummary(baseModule.code, baseModule.name, price)
+        } else {
+            summaryMap.remove(baseModule.code)
         }
 
-        if (baseModuleList.isNotEmpty()) {
-            moduleGroupAdapter.submitList(baseModuleList[0].moduleGroups)
+        var total = 0
+        val moduleSummaryList: ArrayList<ModuleGroupSummary> = ArrayList()
+        for (key in summaryMap.keys) {
+            val item = summaryMap[key] ?: continue
+            moduleSummaryList.add(item)
+            total += item.price
         }
+        total += baseTotal
+        val totalText = "৳$total"
+        binding.appBarMain.contentMain.summarySheet.total.text = totalText
+        moduleSummaryAdapter.submitList(moduleSummaryList)
     }
 
     override fun onBackPressed() {

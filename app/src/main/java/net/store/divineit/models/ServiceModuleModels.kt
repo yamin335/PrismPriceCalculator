@@ -1,5 +1,11 @@
 package net.store.divineit.models
 
+data class ModuleGroupSummary (
+    val code: String,
+    val title: String,
+    val price: Int
+)
+
 data class BaseServiceModule (
     val code: String,
     val name: String,
@@ -27,7 +33,8 @@ data class ServiceModule (
     val dependencies: List<String>,
     val price: Price? = null,
     val ready: String? = null,
-    val showMultiplier: String? = null
+    val showMultiplier: String? = null,
+    var isAdded: Boolean = false
 )
 
 data class Feature (
@@ -37,7 +44,8 @@ data class Feature (
     val dependencies: List<String>,
     val price: Price? = null,
     val ready: String? = null,
-    val excludeInAll: Long? = null
+    val excludeInAll: Long? = null,
+    var isAdded: Boolean = false
 )
 
 data class SubModule (
