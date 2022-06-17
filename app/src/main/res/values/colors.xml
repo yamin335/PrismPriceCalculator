@@ -41,4 +41,6 @@
     <color name="textColor2">#777777</color>
     <color name="textColor3">#404040</color>
     <color name="textColor4">#999999</color>
+
+    <color name="chip_ripple_color">#33FFFFFF</color>
 </resources>

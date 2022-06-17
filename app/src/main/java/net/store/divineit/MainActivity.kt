@@ -105,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         baseServiceAdapter = BaseServiceModuleListAdapter(baseModuleList) { baseModule, position ->
+            changeHeader(baseModule.code)
             selectedBaseModulePosition = position
             binding.drawerLayout.closeDrawer(GravityCompat.END)
             CoroutineScope(Dispatchers.Main.immediate).launch {
@@ -119,6 +120,8 @@ class MainActivity : AppCompatActivity() {
         }
         baseServiceAdapter.submitList(baseModuleList)
         binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
+
+        changeHeader(baseModuleList[0].code)
 
         summarySheetBehavior = BottomSheetBehavior.from(binding.appBarMain.contentMain.summarySheet.root)
 
@@ -157,9 +160,7 @@ class MainActivity : AppCompatActivity() {
         var isAdded = false
         var price = 0
         for (moduleGroup in baseModule.moduleGroups) {
-            val modules = moduleGroup.modules
-
-            for (module in modules) {
+            for (module in moduleGroup.modules) {
                 if (module.isAdded) {
                     val slab1 = module.price?.slab1
                     if (slab1 != null) {
@@ -222,6 +223,45 @@ class MainActivity : AppCompatActivity() {
         val totalText = "৳$total"
         binding.appBarMain.contentMain.summarySheet.total.text = totalText
         moduleSummaryAdapter.submitList(moduleSummaryList)
+    }
+
+    private fun changeHeader(code: String) {
+        binding.appBarMain.contentMain.headerStart.root.visibility = if (code == "START") View.VISIBLE else View.GONE
+        binding.appBarMain.contentMain.headerFMS.root.visibility = if (code == "FMS") View.VISIBLE else View.GONE
+        binding.appBarMain.contentMain.headerHCM.root.visibility = if (code == "HCM") View.VISIBLE else View.GONE
+        binding.appBarMain.contentMain.headerPPC.root.visibility = if (code == "PPC") View.VISIBLE else View.GONE
+        when(code) {
+            "START" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+            }
+            "FMS" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+            }
+            "SDM" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+            }
+            "CRM" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+            }
+            "SCM" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+            }
+            "HCM" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+            }
+            "PPC" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+            }
+            "EAM" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+            }
+            "CSC" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+            }
+            "PIP" -> {
+                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+            }
+        }
     }
 
     override fun onBackPressed() {

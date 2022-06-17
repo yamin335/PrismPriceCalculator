@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Industry Type"
+            android:textColor="@color/textColor1" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/industryTypes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:chipSpacingHorizontal="6dp"
+            app:chipSpacingVertical="6dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/industryType1"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/industryType2"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/industryType3"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Production Units"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/textColor1" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/productionUnits"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:chipSpacingHorizontal="6dp"
+            app:chipSpacingVertical="6dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/productionUnit1"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/productionUnit2"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/productionUnit3"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/productionUnit10"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Line/Machine"
+            android:textColor="@color/textColor1" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/mahines"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:chipSpacingHorizontal="6dp"
+            app:chipSpacingVertical="6dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/machine5"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/machine10"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/machine20"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/machine50"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Type of Finished Goods"
+            android:textColor="@color/textColor1" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/finishedGoods"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:chipSpacingHorizontal="6dp"
+            app:chipSpacingVertical="6dp">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/gds1to10"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 - 10"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/gds11to50"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="11 - 50"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/gds51to200"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="51 - 200"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/gds201to500"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="201 - 500"
+                android:textSize="11sp"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+        </com.google.android.material.chip.ChipGroup>
+    </LinearLayout>
+</layout>
