@@ -66,6 +66,7 @@
                         android:textStyle="bold"/>
 
                     <LinearLayout
+                        android:id="@+id/linearShowHide"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="top"
@@ -86,6 +87,7 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/linearActions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
@@ -119,6 +121,7 @@
                             android:layout_marginStart="8dp"/>
                     </LinearLayout>
                     <TextView
+                        android:id="@+id/numberOfSelectedModules"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="No Module Selected"

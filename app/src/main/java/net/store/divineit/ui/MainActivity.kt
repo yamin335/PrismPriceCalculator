@@ -1,4 +1,4 @@
-package net.store.divineit
+package net.store.divineit.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -14,12 +14,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.store.divineit.R
 import net.store.divineit.databinding.ActivityMainBinding
 import net.store.divineit.models.BaseServiceModule
 import net.store.divineit.models.ModuleGroupSummary
-import net.store.divineit.ui.BaseServiceModuleListAdapter
-import net.store.divineit.ui.ModuleGroupAdapter
-import net.store.divineit.ui.ModuleGroupSummaryListAdapter
 import java.io.*
 
 
@@ -60,7 +58,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar, R.string.open, R.string.close) {
+        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar,
+            R.string.open,
+            R.string.close
+        ) {
             override fun onDrawerClosed(drawerView: View) {
                 super.onDrawerClosed(drawerView)
             }
@@ -90,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         moduleSummaryAdapter = ModuleGroupSummaryListAdapter()
         binding.appBarMain.contentMain.summarySheet.recyclerSummary.adapter = moduleSummaryAdapter
 
-        moduleGroupAdapter = ModuleGroupAdapter(baseModuleList[0].moduleGroups) {
+        moduleGroupAdapter = ModuleGroupAdapter(baseModuleList[0].code, baseModuleList[0].moduleGroups) {
             calculateSummary()
         }
 
@@ -110,7 +111,7 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout.closeDrawer(GravityCompat.END)
             CoroutineScope(Dispatchers.Main.immediate).launch {
                 delay(250)
-                moduleGroupAdapter = ModuleGroupAdapter(baseModule.moduleGroups) {
+                moduleGroupAdapter = ModuleGroupAdapter(baseModule.code, baseModule.moduleGroups) {
                     calculateSummary()
                 }
                 binding.appBarMain.contentMain.recyclerView.apply {
@@ -188,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 for (subModule in module.submodules) {
-                    val features = subModule.features ?: continue
+                    val features = subModule.features
                     for (feature in features) {
                         if (feature.isAdded) {
                             val slab1 = feature.price?.slab1
@@ -230,6 +231,10 @@ class MainActivity : AppCompatActivity() {
         binding.appBarMain.contentMain.headerFMS.root.visibility = if (code == "FMS") View.VISIBLE else View.GONE
         binding.appBarMain.contentMain.headerHCM.root.visibility = if (code == "HCM") View.VISIBLE else View.GONE
         binding.appBarMain.contentMain.headerPPC.root.visibility = if (code == "PPC") View.VISIBLE else View.GONE
+        binding.appBarMain.contentMain.headerEAM.root.visibility = if (code == "EAM") View.VISIBLE else View.GONE
+        binding.appBarMain.contentMain.headerCSC.root.visibility = if (code == "CSC") View.VISIBLE else View.GONE
+        binding.appBarMain.contentMain.headerPIP.root.visibility = if (code == "PIP") View.VISIBLE else View.GONE
+
         when(code) {
             "START" -> {
                 binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
@@ -253,13 +258,13 @@ class MainActivity : AppCompatActivity() {
                 binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
             }
             "EAM" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
             }
             "CSC" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
             }
             "PIP" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
             }
         }
     }

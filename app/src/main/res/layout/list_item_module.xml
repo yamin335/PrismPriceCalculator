@@ -43,6 +43,7 @@
                 tools:text="pdP" />
 
             <TextView
+                android:id="@+id/verticalLine"
                 android:layout_width="1dp"
                 android:layout_height="0dp"
                 android:layout_marginStart="45dp"

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/app_bar_main"
-    tools:context=".MainActivity">
+    tools:context=".ui.MainActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -77,9 +77,25 @@
                     android:id="@+id/headerHCM"
                     layout="@layout/header_hcm"
                     android:visibility="gone"/>
+
                 <include
                     android:id="@+id/headerPPC"
                     layout="@layout/header_ppc"
+                    android:visibility="gone"/>
+
+                <include
+                    android:id="@+id/headerEAM"
+                    layout="@layout/header_eam"
+                    android:visibility="gone"/>
+
+                <include
+                    android:id="@+id/headerCSC"
+                    layout="@layout/header_csc"
+                    android:visibility="gone"/>
+
+                <include
+                    android:id="@+id/headerPIP"
+                    layout="@layout/header_pip"
                     android:visibility="gone"/>
             </LinearLayout>
 

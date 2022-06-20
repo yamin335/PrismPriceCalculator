@@ -51,7 +51,7 @@ data class Feature (
 data class SubModule (
     val name: String,
     val code: String,
-    val features: List<Feature>? = null,
+    val features: List<Feature> = ArrayList(),
     val description: String? = null,
     val dependencies: List<Any?>,
     val price: Price? = null

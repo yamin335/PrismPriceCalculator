@@ -10,12 +10,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Accounts"
+            android:text="Users"
             android:textSize="16sp"
             android:textColor="@color/textColor3" />
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/accounts"
+            android:id="@+id/users"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:singleSelection="true"
@@ -23,11 +23,11 @@
             app:chipSpacingVertical="6dp">
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/ac1to400"
+                android:id="@+id/user1to5"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Small (1-400)"
+                android:text="1 - 5"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
@@ -35,11 +35,11 @@
                 app:checkedIcon="@drawable/ic_baseline_check_24"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/ac401to800"
+                android:id="@+id/user6to10"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium (401-800)"
+                android:text="6 - 10"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
@@ -47,40 +47,11 @@
                 app:checkedIcon="@drawable/ic_baseline_check_24"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/ac801to1200"
+                android:id="@+id/user11to25"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Large (801-1200)"
-                app:checkedIconVisible="false"
-                android:textColor="@color/chip_text_state_colors"
-                app:rippleColor="@color/chip_ripple_color"
-                app:chipBackgroundColor="@color/chip_background_state_colors"
-                app:checkedIcon="@drawable/ic_baseline_check_24"/>
-        </com.google.android.material.chip.ChipGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Customers"
-            android:layout_marginTop="10dp"
-            android:textSize="16sp"
-            android:textColor="@color/textColor3" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/customers"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:chipSpacingHorizontal="6dp"
-            app:chipSpacingVertical="6dp">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/cus1to500"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Small (1-500)"
+                android:text="11 - 25"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
@@ -88,11 +59,11 @@
                 app:checkedIcon="@drawable/ic_baseline_check_24"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/cus5001to2000"
+                android:id="@+id/user26to50"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium (501-2000)"
+                android:text="26 - 50"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
@@ -100,40 +71,11 @@
                 app:checkedIcon="@drawable/ic_baseline_check_24"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/cus2001to5000"
+                android:id="@+id/user51to100"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Large (2001-5000)"
-                app:checkedIconVisible="false"
-                android:textColor="@color/chip_text_state_colors"
-                app:rippleColor="@color/chip_ripple_color"
-                app:chipBackgroundColor="@color/chip_background_state_colors"
-                app:checkedIcon="@drawable/ic_baseline_check_24"/>
-        </com.google.android.material.chip.ChipGroup>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Vendors"
-            android:textSize="16sp"
-            android:textColor="@color/textColor3" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/vendors"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:chipSpacingHorizontal="6dp"
-            app:chipSpacingVertical="6dp">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/ven1to500"
-                style="@style/Widget.MaterialComponents.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Small (1-500)"
+                android:text="51 - 100"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
@@ -141,11 +83,11 @@
                 app:checkedIcon="@drawable/ic_baseline_check_24"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/ven501to2000"
+                android:id="@+id/user101to150"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Medium (501-2000)"
+                android:text="11 - 150"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
@@ -153,11 +95,23 @@
                 app:checkedIcon="@drawable/ic_baseline_check_24"/>
 
             <com.google.android.material.chip.Chip
-                android:id="@+id/ven2001to5000"
+                android:id="@+id/user151to200"
                 style="@style/Widget.MaterialComponents.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Large (2001-5000)"
+                android:text="151 - 200"
+                app:checkedIconVisible="false"
+                android:textColor="@color/chip_text_state_colors"
+                app:rippleColor="@color/chip_ripple_color"
+                app:chipBackgroundColor="@color/chip_background_state_colors"
+                app:checkedIcon="@drawable/ic_baseline_check_24"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/user201to300"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="201 - 300"
                 app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"

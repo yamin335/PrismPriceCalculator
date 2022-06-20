@@ -15,8 +15,10 @@ import net.store.divineit.models.ServiceModule
 import net.store.divineit.utils.toShortForm
 
 class ModuleListAdapter internal constructor(
+    private val baseModuleCode: String,
     private var dataList: List<ServiceModule>,
-    private val callback: (ServiceModule) -> Unit
+    private val callback: (ServiceModule) -> Unit,
+    private val moduleChangeCallback: () -> Unit
 ) : RecyclerView.Adapter<ModuleListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,7 +44,17 @@ class ModuleListAdapter internal constructor(
             val mContext = binding.root.context
             val item = dataList[position]
             binding.item = item
-            binding.titleShortForm.text = item.name.toShortForm()
+
+            if (baseModuleCode == "START") {
+                binding.verticalLine.visibility = View.GONE
+                binding.titleShortForm.background = ContextCompat.getDrawable(mContext, R.drawable.rounded_rectangle_red_1)
+                binding.titleShortForm.text = (position.toDouble() + 1).toString()
+            } else {
+                binding.titleShortForm.background = ContextCompat.getDrawable(mContext, R.drawable.rounded_rectangle_green_2)
+                binding.verticalLine.visibility = View.VISIBLE
+                binding.titleShortForm.text = item.name.toShortForm()
+            }
+
             val price = item.price?.slab1
             if (price != null) {
                 binding.linearPrice.visibility = View.VISIBLE
@@ -55,7 +67,27 @@ class ModuleListAdapter internal constructor(
             }
 
             val subModuleListAdapter = SubModuleListAdapter(dataList[position].submodules) {
-                callback(dataList[position])
+                if (!dataList[position].isAdded) {
+                    for (subModule in dataList[position].submodules) {
+                        for (feature in subModule.features) {
+                            if (feature.isAdded) {
+                                dataList[position].isAdded = true
+                                break
+                            }
+                        }
+                        if (dataList[position].isAdded) {
+                            break
+                        }
+                    }
+
+                    if (dataList[position].isAdded) {
+                        moduleChangeCallback()
+                    } else {
+                        callback(dataList[position])
+                    }
+                } else {
+                    callback(dataList[position])
+                }
             }
             val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
             innerLLM.initialPrefetchItemCount = 2
@@ -69,7 +101,22 @@ class ModuleListAdapter internal constructor(
             //subModuleListAdapter.submitList(item.submodules)
 
             val featureListAdapter = FeatureListAdapter(dataList[position].features) {
-                callback(dataList[position])
+                if (!dataList[position].isAdded) {
+                    for (feature in dataList[position].features) {
+                        if (feature.isAdded) {
+                            dataList[position].isAdded = true
+                            break
+                        }
+                    }
+
+                    if (dataList[position].isAdded) {
+                        moduleChangeCallback()
+                    } else {
+                        callback(dataList[position])
+                    }
+                } else {
+                    callback(dataList[position])
+                }
             }
 
             val innerLLM2 = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
@@ -93,8 +140,19 @@ class ModuleListAdapter internal constructor(
 
             binding.btnAdd.setOnClickListener {
                 dataList[position].isAdded = !dataList[position].isAdded
-                notifyItemChanged(position)
-                callback(dataList[position])
+
+                if (!dataList[position].isAdded) {
+                    for (feature in dataList[position].features) {
+                        feature.isAdded = false
+                    }
+
+                    for (subModule in dataList[position].submodules) {
+                        for (feature in subModule.features) {
+                            feature.isAdded = false
+                        }
+                    }
+                }
+                moduleChangeCallback()
             }
         }
     }

@@ -11,7 +11,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Industry Type"
-            android:textColor="@color/textColor1" />
+            android:textSize="16sp"
+            android:textColor="@color/textColor3" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/industryTypes"
@@ -27,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -39,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -51,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -63,7 +64,8 @@
             android:layout_height="wrap_content"
             android:text="Production Units"
             android:layout_marginTop="10dp"
-            android:textColor="@color/textColor1" />
+            android:textSize="16sp"
+            android:textColor="@color/textColor3" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/productionUnits"
@@ -79,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -91,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -103,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -115,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -127,7 +129,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Line/Machine"
-            android:textColor="@color/textColor1" />
+            android:textSize="16sp"
+            android:textColor="@color/textColor3" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/mahines"
@@ -143,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="5"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -155,7 +158,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="10"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -167,7 +170,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="20"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -179,7 +182,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="50"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -191,7 +194,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:text="Type of Finished Goods"
-            android:textColor="@color/textColor1" />
+            android:textSize="16sp"
+            android:textColor="@color/textColor3" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/finishedGoods"
@@ -207,7 +211,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1 - 10"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -219,7 +223,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="11 - 50"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -231,7 +235,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="51 - 200"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"
@@ -243,7 +247,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="201 - 500"
-                android:textSize="11sp"
+                app:checkedIconVisible="false"
                 android:textColor="@color/chip_text_state_colors"
                 app:rippleColor="@color/chip_ripple_color"
                 app:chipBackgroundColor="@color/chip_background_state_colors"

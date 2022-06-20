@@ -31,6 +31,9 @@
     // Green
     <color name="green1">#28A745</color>
 
+    // Red
+    <color name="red1">#FF0000</color>
+
     // Blue
     <color name="blue1">#037BFF</color>
     <color name="blue2">#13A2B8</color>
