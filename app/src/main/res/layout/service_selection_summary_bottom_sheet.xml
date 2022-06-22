@@ -92,7 +92,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/total"
+                    android:id="@+id/costTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -135,10 +135,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/costSoftwareLicense"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="৳1,90,000"
+                    tools:text="৳1,90,000"
                     android:textColor="@color/green1"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -202,10 +203,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costAdditionalUsers"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="৳1,50,000"
+                    tools:text="৳1,50,000"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -230,10 +232,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/costImplementation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="৳10,000"
+                    tools:text="৳10,000"
                     android:textColor="@color/green1"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -266,10 +269,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costRequirementAnalysis"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -288,10 +292,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costDeployment"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="৳10,000"
+                    tools:text="৳10,000"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -310,10 +315,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costConfiguration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -332,10 +338,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costOnsiteAdoptionSupport"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -354,10 +361,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costTraining"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -376,10 +384,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costProjectManagement"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -404,10 +413,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/costSoftwareCustomizationTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -440,10 +450,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costSoftwareCustomization"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -462,10 +473,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costCustomizedReport"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -490,10 +502,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/costConsultancyServices"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -526,10 +539,11 @@
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costConsultancy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 
@@ -554,10 +568,11 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/costAnnualMaintenanceTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="৳30,000"
+                    tools:text="৳30,000"
                     android:textColor="@color/green1"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -586,14 +601,15 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Consultancy"
+                    android:text="Annual Maintenance Cost"
                     android:textColor="@color/textColor1" />
 
                 <TextView
+                    android:id="@+id/costAnnualMaintenance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="-"
+                    tools:text="-"
                     android:textColor="@color/green1" />
             </LinearLayout>
 

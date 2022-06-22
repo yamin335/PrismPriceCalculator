@@ -95,7 +95,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            tools:itemCount="2"
+            tools:itemCount="1"
             tools:listitem="@layout/list_item_feature" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

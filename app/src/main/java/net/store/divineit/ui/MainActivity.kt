@@ -32,7 +32,24 @@ class MainActivity : AppCompatActivity() {
     private var selectedBaseModulePosition = 0
     private lateinit var baseModuleList: List<BaseServiceModule>
     private var summaryMap: HashMap<String, ModuleGroupSummary> = HashMap()
-    private val baseTotal = 190000
+
+    private var costSoftwareLicense = 0
+    private var costAdditionalUsers = 0
+    private var costImplementation = 0
+    private var costRequirementAnalysis = 0
+    private var costDeployment = 0
+    private var costConfiguration = 0
+    private var costOnsiteAdoptionSupport = 0
+    private var costTraining = 0
+    private var costProjectManagement = 0
+    private var costSoftwareCustomizationTotal = 0
+    private var costSoftwareCustomization = 0
+    private var costCustomizedReport = 0
+    private var costConsultancyServices = 0
+    private var costConsultancy = 0
+    private var costAnnualMaintenanceTotal = 0
+    private var costAnnualMaintenance = 0
+    private var costTotal = 0
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +61,12 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        val totalText = "৳$baseTotal"
-        binding.appBarMain.contentMain.summarySheet.total.text = totalText
+        costAdditionalUsers = 150000
+        costDeployment = 10000
+        costAnnualMaintenance = 30000
+
+        calculateSummaryCost(0)
+        bindSummaryCostDataToUI()
 
         mDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent?): Boolean {
@@ -213,16 +234,16 @@ class MainActivity : AppCompatActivity() {
             summaryMap.remove(baseModule.code)
         }
 
-        var total = 0
+        var moduleCost = 0
         val moduleSummaryList: ArrayList<ModuleGroupSummary> = ArrayList()
         for (key in summaryMap.keys) {
             val item = summaryMap[key] ?: continue
             moduleSummaryList.add(item)
-            total += item.price
+            moduleCost += item.price
         }
-        total += baseTotal
-        val totalText = "৳$total"
-        binding.appBarMain.contentMain.summarySheet.total.text = totalText
+
+        calculateSummaryCost(moduleCost)
+        bindSummaryCostDataToUI()
         moduleSummaryAdapter.submitList(moduleSummaryList)
     }
 
@@ -267,6 +288,73 @@ class MainActivity : AppCompatActivity() {
                 binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun calculateSummaryCost(moduleCost: Int) {
+        costSoftwareLicense = moduleCost + costAdditionalUsers
+
+        costImplementation = costRequirementAnalysis + costDeployment + costConfiguration + costOnsiteAdoptionSupport + costTraining + costProjectManagement
+
+        costSoftwareCustomizationTotal = costSoftwareCustomization + costCustomizedReport
+
+        costConsultancyServices = costConsultancy
+
+        costAnnualMaintenanceTotal = costAnnualMaintenance
+
+        costTotal = costSoftwareLicense + costImplementation + costSoftwareCustomizationTotal + costConsultancyServices + costAnnualMaintenanceTotal
+    }
+
+    private fun bindSummaryCostDataToUI() {
+        val costSoftwareLicenseText = if (costSoftwareLicense > 0) "৳$costSoftwareLicense" else "-"
+        binding.appBarMain.contentMain.summarySheet.costSoftwareLicense.text = costSoftwareLicenseText
+
+        val costAdditionalUsersText = if (costAdditionalUsers > 0) "৳$costAdditionalUsers" else "-"
+        binding.appBarMain.contentMain.summarySheet.costAdditionalUsers.text = costAdditionalUsersText
+
+        val costImplementationText = if (costImplementation > 0) "৳$costImplementation" else "-"
+        binding.appBarMain.contentMain.summarySheet.costImplementation.text = costImplementationText
+
+        val costRequirementAnalysisText = if (costRequirementAnalysis > 0) "৳$costRequirementAnalysis" else "-"
+        binding.appBarMain.contentMain.summarySheet.costRequirementAnalysis.text = costRequirementAnalysisText
+
+        val costDeploymentText = if (costDeployment > 0) "৳$costDeployment" else "-"
+        binding.appBarMain.contentMain.summarySheet.costDeployment.text = costDeploymentText
+
+        val costConfigurationText = if (costConfiguration > 0) "৳$costConfiguration" else "-"
+        binding.appBarMain.contentMain.summarySheet.costConfiguration.text = costConfigurationText
+
+        val costOnsiteAdoptionSupportText = if (costOnsiteAdoptionSupport > 0) "৳$costOnsiteAdoptionSupport" else "-"
+        binding.appBarMain.contentMain.summarySheet.costOnsiteAdoptionSupport.text = costOnsiteAdoptionSupportText
+
+        val costTrainingText = if (costTraining > 0) "৳$costTraining" else "-"
+        binding.appBarMain.contentMain.summarySheet.costTraining.text = costTrainingText
+
+        val costProjectManagementText = if (costProjectManagement > 0) "৳$costProjectManagement" else "-"
+        binding.appBarMain.contentMain.summarySheet.costProjectManagement.text = costProjectManagementText
+
+        val costSoftwareCustomizationTotalText = if (costSoftwareCustomizationTotal > 0) "৳$costSoftwareCustomizationTotal" else "-"
+        binding.appBarMain.contentMain.summarySheet.costSoftwareCustomizationTotal.text = costSoftwareCustomizationTotalText
+
+        val costSoftwareCustomizationText = if (costSoftwareCustomization > 0) "৳$costSoftwareCustomization" else "-"
+        binding.appBarMain.contentMain.summarySheet.costSoftwareCustomization.text = costSoftwareCustomizationText
+
+        val costCustomizedReportText = if (costCustomizedReport > 0) "৳$costCustomizedReport" else "-"
+        binding.appBarMain.contentMain.summarySheet.costCustomizedReport.text = costCustomizedReportText
+
+        val costConsultancyServicesText = if (costConsultancyServices > 0) "৳$costConsultancyServices" else "-"
+        binding.appBarMain.contentMain.summarySheet.costConsultancyServices.text = costConsultancyServicesText
+
+        val costConsultancyText = if (costConsultancy > 0) "৳$costConsultancy" else "-"
+        binding.appBarMain.contentMain.summarySheet.costConsultancy.text = costConsultancyText
+
+        val costAnnualMaintenanceTotalText = if (costAnnualMaintenanceTotal > 0) "৳$costAnnualMaintenanceTotal" else "-"
+        binding.appBarMain.contentMain.summarySheet.costAnnualMaintenanceTotal.text = costAnnualMaintenanceTotalText
+
+        val costAnnualMaintenanceText = if (costAnnualMaintenance > 0) "৳$costAnnualMaintenance" else "-"
+        binding.appBarMain.contentMain.summarySheet.costAnnualMaintenance.text = costAnnualMaintenanceText
+
+        val costTotalText = if (costTotal > 0) "৳$costTotal" else "-"
+        binding.appBarMain.contentMain.summarySheet.costTotal.text = costTotalText
     }
 
     override fun onBackPressed() {
