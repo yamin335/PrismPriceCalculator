@@ -3,4 +3,11 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="module_list">Module List</string>
+    <string name="login">Log In</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="copyright">All rights reserved. Copyright ©2022, Divine IT Ltd.</string>
+    <string name="create_your_account">Create Your Account</string>
 </resources>

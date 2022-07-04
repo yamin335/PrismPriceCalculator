@@ -1,5 +1,12 @@
 package net.store.divineit.models
 
+data class BusinessService (
+    val code: String?,
+    val icon: String?,
+    val description: String?,
+    val startingPrice: Int?
+)
+
 data class ModuleGroupSummary (
     val code: String,
     val title: String,

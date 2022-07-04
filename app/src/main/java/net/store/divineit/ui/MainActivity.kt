@@ -1,6 +1,7 @@
 package net.store.divineit.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var moduleGroupAdapter: ModuleGroupAdapter
     private lateinit var summarySheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var baseServiceAdapter: BaseServiceModuleListAdapter
-    private lateinit var mDrawerToggle: ActionBarDrawerToggle
+    //private lateinit var mDrawerToggle: ActionBarDrawerToggle
     private lateinit var mDetector: GestureDetector
     private lateinit var moduleSummaryAdapter: ModuleGroupSummaryListAdapter
     private var selectedBaseModulePosition = 0
@@ -57,9 +58,8 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //ViewCompat.setLayoutDirection(binding.appBarMain.toolbar, ViewCompat.LAYOUT_DIRECTION_RTL)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
+        setUpToolbar()
 
         costAdditionalUsers = 150000
         costDeployment = 10000
@@ -79,19 +79,19 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar,
-            R.string.open,
-            R.string.close
-        ) {
-            override fun onDrawerClosed(drawerView: View) {
-                super.onDrawerClosed(drawerView)
-            }
-
-            override fun onDrawerOpened(drawerView: View) {
-                super.onDrawerOpened(drawerView)
-            }
-        }
-        binding.drawerLayout.addDrawerListener(mDrawerToggle)
+//        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar,
+//            R.string.open,
+//            R.string.close
+//        ) {
+//            override fun onDrawerClosed(drawerView: View) {
+//                super.onDrawerClosed(drawerView)
+//            }
+//
+//            override fun onDrawerOpened(drawerView: View) {
+//                super.onDrawerOpened(drawerView)
+//            }
+//        }
+//        binding.drawerLayout.addDrawerListener(mDrawerToggle)
 
         val inputStream: InputStream = resources.openRawResource(R.raw.divine)
         val writer: Writer = StringWriter()
@@ -175,6 +175,12 @@ class MainActivity : AppCompatActivity() {
                 // Do something for slide offset.
             }
         })
+    }
+
+    private fun setUpToolbar() {
+        binding.appBarMain.toolbar.title = "Prism Price Calculator"
+        setSupportActionBar(binding.appBarMain.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     private fun calculateSummary() {
@@ -371,15 +377,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (item.itemId == R.id.moduleList) {
-            if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                binding.drawerLayout.closeDrawer(GravityCompat.END)
-            } else {
-                binding.drawerLayout.openDrawer(GravityCompat.END)
+        return when (item.itemId) {
+            R.id.moduleList -> {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.END)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                } else {
+                    binding.drawerLayout.openDrawer(GravityCompat.END)
+                }
+                true
             }
-            true
-        } else {
-            super.onOptionsItemSelected(item)
+            android.R.id.home -> {
+                goBack()
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
         }
+    }
+
+    private fun goBack() {
+        finish()
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 }
