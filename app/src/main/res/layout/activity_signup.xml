@@ -2,7 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.LoginActivity">
+    tools:context=".ui.signup.SignUpActivity">
+
+    <data class="SignUpActivityBinding">
+        <variable
+            name="viewModel"
+            type="net.store.divineit.ui.signup.SignUpViewModel" />
+    </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -32,7 +38,7 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             android:indeterminateTint="@color/blue3"
-            android:visibility="invisible"/>
+            app:showLoader="@{viewModel.apiCallStatus}"/>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -117,6 +123,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
+                        android:text="@={viewModel.firstName}"
                         android:importantForAutofill="yes"
                         android:inputType="text"
                         android:textColor="@color/textColor3" />
@@ -147,6 +154,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
+                        android:text="@={viewModel.lastName}"
                         android:importantForAutofill="yes"
                         android:inputType="text"
                         android:textColor="@color/textColor3" />
@@ -177,8 +185,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
+                        android:text="@={viewModel.email}"
                         android:importantForAutofill="yes"
-                        android:inputType="text"
+                        android:inputType="textEmailAddress"
                         android:textColor="@color/textColor3" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -207,6 +216,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
+                        android:text="@={viewModel.companyName}"
                         android:importantForAutofill="yes"
                         android:inputType="text"
                         android:textColor="@color/textColor3" />
@@ -238,6 +248,7 @@
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
                         android:importantForAutofill="yes"
+                        android:text="@={viewModel.mobileNumber}"
                         android:inputType="phone"
                         android:textColor="@color/textColor3" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -270,6 +281,7 @@
                         android:imeOptions="actionNext"
                         android:importantForAutofill="yes"
                         android:inputType="textPassword"
+                        android:text="@={viewModel.password}"
                         android:textColor="@color/textColor3" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -302,6 +314,7 @@
                         android:imeOptions="actionDone"
                         android:importantForAutofill="yes"
                         android:inputType="textPassword"
+                        android:text="@={viewModel.reTypePassword}"
                         android:textColor="@color/textColor3" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -317,6 +330,7 @@
                     android:layout_marginBottom="32dp"
                     android:backgroundTint="@color/themeColor"
                     android:enabled="false"
+                    android:onClick="@{() -> viewModel.signUp()}"
                     android:text="@string/sign_up"
                     android:textAllCaps="false"
                     android:textColor="@color/button_text_state_colors"

@@ -1,24 +1,36 @@
-package net.store.divineit.ui
+package net.store.divineit.ui.home
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.view.GravityCompat
+import androidx.activity.viewModels
+import dagger.hilt.android.AndroidEntryPoint
+import net.store.divineit.BR
 import net.store.divineit.R
-import net.store.divineit.databinding.ActivityHomeBinding
+import net.store.divineit.databinding.HomeActivityBinding
 import net.store.divineit.models.BusinessService
+import net.store.divineit.ui.BusinessServiceListAdapter
+import net.store.divineit.ui.base.BaseActivity
+import net.store.divineit.ui.login.LoginActivity
 
-class HomeActivity : AppCompatActivity() {
-    lateinit var binding: ActivityHomeBinding
+@AndroidEntryPoint
+class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
+    override val bindingVariable: Int
+        get() = BR.viewModel
+    override val layoutId: Int
+        get() = R.layout.activity_home
+    override val viewModel: HomeViewModel by viewModels()
+
     lateinit var serviceAdapter: BusinessServiceListAdapter
+
+    override fun onResume() {
+        super.onResume()
+        invalidateOptionsMenu()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityHomeBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         setUpToolbar()
 
@@ -34,7 +46,7 @@ class HomeActivity : AppCompatActivity() {
                 2000))
 
         serviceAdapter = BusinessServiceListAdapter(listOfServices) {
-            startActivity(Intent(this@HomeActivity, MainActivity::class.java))
+            startActivity(Intent(this@HomeActivity, PricingActivity::class.java))
             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }
 
@@ -49,8 +61,12 @@ class HomeActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_login, menu)
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (preferencesHelper.isLoggedIn) {
+            menuInflater.inflate(R.menu.menu_logout, menu)
+        } else {
+            menuInflater.inflate(R.menu.menu_login, menu)
+        }
         return true
     }
 
@@ -59,6 +75,11 @@ class HomeActivity : AppCompatActivity() {
             R.id.login -> {
                 startActivity(Intent(this@HomeActivity, LoginActivity::class.java))
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
+                true
+            }
+            R.id.logout -> {
+                preferencesHelper.logoutUser()
+                invalidateOptionsMenu()
                 true
             }
             else -> {

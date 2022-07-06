@@ -1,32 +1,37 @@
-package net.store.divineit.ui
+package net.store.divineit.ui.home
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.core.view.GravityCompat
+import androidx.activity.viewModels
+import dagger.hilt.android.AndroidEntryPoint
+import net.store.divineit.BR
 import net.store.divineit.R
-import net.store.divineit.databinding.ActivityLoginBinding
+import net.store.divineit.databinding.PricingActivityBinding
+import net.store.divineit.ui.main.MainActivity
+import net.store.divineit.ui.base.BaseActivity
 
-class LoginActivity : AppCompatActivity() {
-    lateinit var binding: ActivityLoginBinding
+@AndroidEntryPoint
+class PricingActivity : BaseActivity<PricingActivityBinding, PricingViewModel>() {
+    override val bindingVariable: Int
+        get() = BR.viewModel
+    override val layoutId: Int
+        get() = R.layout.activity_pricing
+    override val viewModel: PricingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
         setUpToolbar()
 
-        binding.btnSignUp.setOnClickListener {
-            startActivity(Intent(this@LoginActivity, SignUpActivity::class.java))
+        binding.btnCustomize.setOnClickListener {
+            startActivity(Intent(this@PricingActivity, MainActivity::class.java))
             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }
     }
 
     private fun setUpToolbar() {
-        binding.toolbar.title = "Account Log In"
+        binding.toolbar.title = "Customize Pricing"
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }

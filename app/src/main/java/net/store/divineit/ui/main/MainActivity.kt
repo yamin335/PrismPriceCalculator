@@ -1,29 +1,41 @@
-package net.store.divineit.ui
+package net.store.divineit.ui.main
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.store.divineit.BR
 import net.store.divineit.R
-import net.store.divineit.databinding.ActivityMainBinding
+import net.store.divineit.databinding.MainActivityBinding
 import net.store.divineit.models.BaseServiceModule
 import net.store.divineit.models.ModuleGroupSummary
+import net.store.divineit.ui.BaseServiceModuleListAdapter
+import net.store.divineit.ui.ModuleGroupAdapter
+import net.store.divineit.ui.ModuleGroupSummaryListAdapter
+import net.store.divineit.ui.base.BaseActivity
+import net.store.divineit.ui.home.PricingViewModel
+import net.store.divineit.ui.login.LoginActivity
 import java.io.*
 
+@AndroidEntryPoint
+class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() {
+    override val bindingVariable: Int
+        get() = BR.viewModel
+    override val layoutId: Int
+        get() = R.layout.activity_main
+    override val viewModel: MainActivityViewModel by viewModels()
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
     private lateinit var moduleGroupAdapter: ModuleGroupAdapter
     private lateinit var summarySheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var baseServiceAdapter: BaseServiceModuleListAdapter
@@ -55,9 +67,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         setUpToolbar()
 
@@ -175,6 +184,15 @@ class MainActivity : AppCompatActivity() {
                 // Do something for slide offset.
             }
         })
+
+        binding.appBarMain.contentMain.summarySheet.btnSubmit.setOnClickListener {
+            if (preferencesHelper.isLoggedIn) {
+                viewModel.toastSuccess.postValue("Submitted Successfully!")
+            } else {
+                startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
+            }
+        }
     }
 
     private fun setUpToolbar() {
@@ -371,7 +389,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.ham_burger_menu, menu)
         return true
     }

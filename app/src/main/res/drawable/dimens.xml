@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacer_large">20dp</dimen>
+    <dimen name="spacer_small">5dp</dimen>
+    <dimen name="halfPageMargin">5dp</dimen><!-- half of distance between pages -->
+    <dimen name="peekOffset">24dp</dimen><!-- how much of adjacent pages is shown -->
+
+    <dimen name="no_margin">0dp</dimen>
+    <dimen name="margin_smallest">2dp</dimen>
+    <dimen name="margin_very_small">4dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_standard">16dp</dimen>
+    <dimen name="margin_medium">24dp</dimen>
+    <dimen name="margin_large">32dp</dimen>
+
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_medium">16sp</dimen>
+    <dimen name="text_large">18sp</dimen>
+
+    <dimen name="slider_height">200dp</dimen>
+
+    <dimen name="dp_5">5dp</dimen>
+    <dimen name="dp_12">12dp</dimen>
+    <dimen name="dp_40">40dp</dimen>
+    <dimen name="dp_48">48dp</dimen>
+    <dimen name="dp_56">56dp</dimen>
+</resources>

@@ -10,4 +10,7 @@
     <string name="sign_up">Sign Up</string>
     <string name="copyright">All rights reserved. Copyright ©2022, Divine IT Ltd.</string>
     <string name="create_your_account">Create Your Account</string>
+    <string name="commonErrorMessage">Something wrong! please try again later</string>
+    <string name="internet_error_msg">Please check Your internet connection!</string>
+    <string name="logout">Log Out</string>
 </resources>

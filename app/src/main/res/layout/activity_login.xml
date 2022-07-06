@@ -2,7 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.LoginActivity">
+    tools:context=".ui.login.LoginActivity">
+
+    <data class="LoginActivityBinding">
+        <variable
+            name="viewModel"
+            type="net.store.divineit.ui.login.LoginViewModel" />
+    </data>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -30,16 +36,17 @@
                     app:popupTheme="@style/Theme.PrismPriceCalculator.PopupOverlay" />
 
             </com.google.android.material.appbar.AppBarLayout>
+
             <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
                 android:id="@+id/loader"
-                android:layout_below="@id/appBarLayout"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_marginTop="-6dp"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/appBarLayout"
+                android:layout_marginTop="-6dp"
                 android:indeterminate="true"
                 android:indeterminateTint="@color/blue3"
-                android:visibility="invisible"/>
+                app:showLoader="@{viewModel.apiCallStatus}"/>
 
             <RelativeLayout
                 android:id="@+id/headerLayout"
@@ -101,8 +108,9 @@
                         android:drawableTint="@color/edittext_icon_color"
                         android:imeOptions="actionNext"
                         android:importantForAutofill="yes"
-                        android:inputType="text"
-                        android:textColor="@color/textColor3" />
+                        android:inputType="textEmailAddress"
+                        android:textColor="@color/textColor3"
+                        android:text="@={viewModel.email}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -137,7 +145,8 @@
                         android:imeOptions="actionDone"
                         android:importantForAutofill="yes"
                         android:inputType="textPassword"
-                        android:textColor="@color/textColor3" />
+                        android:textColor="@color/textColor3"
+                        android:text="@={viewModel.password}"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -152,6 +161,7 @@
                     android:layout_marginBottom="0dp"
                     android:backgroundTint="@color/themeColor"
                     android:enabled="false"
+                    android:onClick="@{() -> viewModel.login()}"
                     android:text="@string/sign_in"
                     android:textAllCaps="false"
                     android:textColor="@color/button_text_state_colors"
