@@ -9,8 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.store.divineit.BR
 import net.store.divineit.R
 import net.store.divineit.databinding.HomeActivityBinding
-import net.store.divineit.models.BusinessService
-import net.store.divineit.ui.BusinessServiceListAdapter
+import net.store.divineit.ui.AllProductsListAdapter
 import net.store.divineit.ui.base.BaseActivity
 import net.store.divineit.ui.login.LoginActivity
 
@@ -22,7 +21,7 @@ class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
         get() = R.layout.activity_home
     override val viewModel: HomeViewModel by viewModels()
 
-    lateinit var serviceAdapter: BusinessServiceListAdapter
+    lateinit var serviceAdapter: AllProductsListAdapter
 
     override fun onResume() {
         super.onResume()
@@ -34,18 +33,7 @@ class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
 
         setUpToolbar()
 
-        val listOfServices = listOf(
-            BusinessService("ERP", "https://prismerp.rtchubs.com/img/prismerp.png",
-                "An ERP System to cover all business needs designed for medium and large business",
-                2500000),
-            BusinessService("ERPJ", "https://prismerp.rtchubs.com/img/J-Series.png",
-            "PrismERP J Series designed for Multi-National & Government Authorities",
-            0),
-            BusinessService("ONEBOOK", "https://prismerp.rtchubs.com/img/Onebook_zfhzCpe.png",
-                "Intelligent Business Assistant for Small and Medium Businesses",
-                2000))
-
-        serviceAdapter = BusinessServiceListAdapter(listOfServices) {
+        serviceAdapter = AllProductsListAdapter {
             startActivity(Intent(this@HomeActivity, PricingActivity::class.java))
             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }
@@ -54,6 +42,11 @@ class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
             adapter = serviceAdapter
         }
 
+        viewModel.allProducts.observe(this) {
+            serviceAdapter.submitList(it)
+        }
+
+        viewModel.loadAllProducts()
     }
 
     private fun setUpToolbar() {

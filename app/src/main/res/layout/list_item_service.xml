@@ -5,7 +5,7 @@
     <data class="ServiceListItemBinding">
         <variable
             name="item"
-            type="net.store.divineit.models.BusinessService" />
+            type="net.store.divineit.models.ServiceProduct" />
     </data>
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

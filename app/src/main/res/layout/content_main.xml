@@ -63,40 +63,17 @@
                     android:layout_marginEnd="1dp"
                     android:background="@color/gray4" />
 
-                <include
-                    android:id="@+id/headerStart"
-                    layout="@layout/header_start"
-                    android:visibility="gone"/>
-
-                <include
-                    android:id="@+id/headerFMS"
-                    layout="@layout/header_fms"
-                    android:visibility="gone"/>
-
-                <include
-                    android:id="@+id/headerHCM"
-                    layout="@layout/header_hcm"
-                    android:visibility="gone"/>
-
-                <include
-                    android:id="@+id/headerPPC"
-                    layout="@layout/header_ppc"
-                    android:visibility="gone"/>
-
-                <include
-                    android:id="@+id/headerEAM"
-                    layout="@layout/header_eam"
-                    android:visibility="gone"/>
-
-                <include
-                    android:id="@+id/headerCSC"
-                    layout="@layout/header_csc"
-                    android:visibility="gone"/>
-
-                <include
-                    android:id="@+id/headerPIP"
-                    layout="@layout/header_pip"
-                    android:visibility="gone"/>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/multipliers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/list_item_multiplier"
+                    tools:itemCount="2"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:clipToPadding="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"/>
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView

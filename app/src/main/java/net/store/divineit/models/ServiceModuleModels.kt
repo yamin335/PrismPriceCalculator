@@ -69,7 +69,8 @@ data class MultiplierClass (
     val label: String,
     val slabConfig: SlabConfig,
     val slabs: List<Any>, // Can be long or string type
-    val name: String
+    val name: String,
+    var slabIndex: Int = 0
 )
 
 data class SlabConfig (

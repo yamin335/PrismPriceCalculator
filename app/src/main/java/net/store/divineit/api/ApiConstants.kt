@@ -2,6 +2,7 @@ package net.store.divineit.api
 
 import net.store.divineit.api.Api.API_VERSION
 import net.store.divineit.api.Api.AUTH_REPO
+import net.store.divineit.api.Api.PRODUCT_REPO
 
 object Api {
     private const val PROTOCOL = "https"
@@ -10,6 +11,7 @@ object Api {
 
     const val API_VERSION = "v1"
     const val AUTH_REPO = "auth"
+    const val PRODUCT_REPO = "product"
 
     const val ContentType = "Content-Type: application/json"
 }
@@ -17,6 +19,7 @@ object Api {
 object ApiEndPoint {
     const val LOGIN = "$API_VERSION/$AUTH_REPO/login"
     const val SIGNUP = "$API_VERSION/$AUTH_REPO/registercustomer"
+    const val ALL_Product = "$API_VERSION/$PRODUCT_REPO/allactive"
 }
 
 object ResponseCodes {

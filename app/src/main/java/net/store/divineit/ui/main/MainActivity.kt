@@ -45,6 +45,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     private var selectedBaseModulePosition = 0
     private lateinit var baseModuleList: List<BaseServiceModule>
     private var summaryMap: HashMap<String, ModuleGroupSummary> = HashMap()
+    private lateinit var multiplierListAdapter: MultiplierListAdapter
 
     private var costSoftwareLicense = 0
     private var costAdditionalUsers = 0
@@ -135,8 +136,17 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             adapter = moduleGroupAdapter
         }
 
+        multiplierListAdapter = MultiplierListAdapter {
+
+        }
+
+        binding.appBarMain.contentMain.multipliers.apply {
+            setHasFixedSize(true)
+            adapter = multiplierListAdapter
+        }
+
         baseServiceAdapter = BaseServiceModuleListAdapter(baseModuleList) { baseModule, position ->
-            changeHeader(baseModule.code)
+            loadHeaderMultipliers(baseModule)
             selectedBaseModulePosition = position
             binding.drawerLayout.closeDrawer(GravityCompat.END)
             CoroutineScope(Dispatchers.Main.immediate).launch {
@@ -152,7 +162,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         baseServiceAdapter.submitList(baseModuleList)
         binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
 
-        changeHeader(baseModuleList[0].code)
+        loadHeaderMultipliers(baseModuleList[0])
 
         summarySheetBehavior = BottomSheetBehavior.from(binding.appBarMain.contentMain.summarySheet.root)
 
@@ -271,48 +281,57 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         moduleSummaryAdapter.submitList(moduleSummaryList)
     }
 
-    private fun changeHeader(code: String) {
-        binding.appBarMain.contentMain.headerStart.root.visibility = if (code == "START") View.VISIBLE else View.GONE
-        binding.appBarMain.contentMain.headerFMS.root.visibility = if (code == "FMS") View.VISIBLE else View.GONE
-        binding.appBarMain.contentMain.headerHCM.root.visibility = if (code == "HCM") View.VISIBLE else View.GONE
-        binding.appBarMain.contentMain.headerPPC.root.visibility = if (code == "PPC") View.VISIBLE else View.GONE
-        binding.appBarMain.contentMain.headerEAM.root.visibility = if (code == "EAM") View.VISIBLE else View.GONE
-        binding.appBarMain.contentMain.headerCSC.root.visibility = if (code == "CSC") View.VISIBLE else View.GONE
-        binding.appBarMain.contentMain.headerPIP.root.visibility = if (code == "PIP") View.VISIBLE else View.GONE
+    private fun loadHeaderMultipliers(baseModule: BaseServiceModule) {
+        if (baseModule.moduleGroups.isEmpty()) return
 
-        when(code) {
-            "START" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-            "FMS" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-            "SDM" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
-            }
-            "CRM" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
-            }
-            "SCM" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
-            }
-            "HCM" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-            "PPC" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-            "EAM" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-            "CSC" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-            "PIP" -> {
-                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
-            }
-        }
+        binding.appBarMain.contentMain.linearHeader.visibility = if (baseModule.moduleGroups[0].multipliers.isEmpty()) View.GONE else View.VISIBLE
+        multiplierListAdapter.submitList(baseModule.moduleGroups[0].multipliers.filter {
+            return@filter it.label.isNotBlank() && it.slabConfig.hideInApp != true
+        })
     }
+
+//    private fun changeHeader(code: String) {
+//        binding.appBarMain.contentMain.headerStart.root.visibility = if (code == "START") View.VISIBLE else View.GONE
+//        binding.appBarMain.contentMain.headerFMS.root.visibility = if (code == "FMS") View.VISIBLE else View.GONE
+//        binding.appBarMain.contentMain.headerHCM.root.visibility = if (code == "HCM") View.VISIBLE else View.GONE
+//        binding.appBarMain.contentMain.headerPPC.root.visibility = if (code == "PPC") View.VISIBLE else View.GONE
+//        binding.appBarMain.contentMain.headerEAM.root.visibility = if (code == "EAM") View.VISIBLE else View.GONE
+//        binding.appBarMain.contentMain.headerCSC.root.visibility = if (code == "CSC") View.VISIBLE else View.GONE
+//        binding.appBarMain.contentMain.headerPIP.root.visibility = if (code == "PIP") View.VISIBLE else View.GONE
+//
+//        when(code) {
+//            "START" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//            "FMS" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//            "SDM" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+//            }
+//            "CRM" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+//            }
+//            "SCM" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.GONE
+//            }
+//            "HCM" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//            "PPC" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//            "EAM" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//            "CSC" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//            "PIP" -> {
+//                binding.appBarMain.contentMain.linearHeader.visibility = View.VISIBLE
+//            }
+//        }
+//    }
 
     private fun calculateSummaryCost(moduleCost: Int) {
         costSoftwareLicense = moduleCost + costAdditionalUsers
