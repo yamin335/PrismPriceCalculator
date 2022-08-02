@@ -14,7 +14,7 @@ import net.store.divineit.databinding.MultiplierListItemBinding
 import net.store.divineit.models.MultiplierClass
 
 class MultiplierListAdapter internal constructor(
-    private val callback: (MultiplierClass) -> Unit
+    private val callback: (Int, String, Int) -> Unit
 ) : RecyclerView.Adapter<MultiplierListAdapter.ViewHolder>() {
 
     private var dataList: ArrayList<MultiplierClass> = ArrayList()
@@ -150,13 +150,19 @@ class MultiplierListAdapter internal constructor(
                         }
                         else -> slab.toString()
                     }
-                    binding.chipGroup.addView(createTagChip(mContext, index, slabText), index)
+                    binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
+                }
+
+                binding.chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+                    if (checkedIds.size == 1) {
+                        callback(checkedIds[0], item.code, position)
+                    }
                 }
             }
         }
     }
 
-    private fun createTagChip(context: Context, chipId: Int, chipName: String): Chip {
+    private fun createTagChip(context: Context, chipId: Int, chipName: String, slabIndex: Int): Chip {
         return Chip(context).apply {
             id = chipId
             setChipDrawable(ChipDrawable.createFromAttributes(context, null, 0, R.style.Widget_MaterialComponents_Chip_Choice))
@@ -164,6 +170,7 @@ class MultiplierListAdapter internal constructor(
             setChipBackgroundColorResource(R.color.chip_background_state_colors)
             setTextColor(ContextCompat.getColor(context, R.color.chip_text_state_colors))
             setRippleColorResource(R.color.chip_ripple_color)
+            isChecked = chipId == slabIndex
         }
 
     }

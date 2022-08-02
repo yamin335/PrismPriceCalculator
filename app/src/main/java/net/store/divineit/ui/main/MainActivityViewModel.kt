@@ -23,5 +23,8 @@ class MainActivityViewModel @Inject constructor(
     @ApplicationContext private val application: Context,
     private val loginRepository: LoginRepository
 ) : BaseViewModel(application) {
-
+    var selectedMultiplier: Pair<Int, String> = Pair(0, "")
+//    val selectedMultiplier: MutableLiveData<Pair<Int, String>> by lazy {
+//        MutableLiveData<Pair<Int, String>>()
+//    }
 }

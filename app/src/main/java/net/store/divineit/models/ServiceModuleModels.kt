@@ -41,7 +41,8 @@ data class ServiceModule (
     val price: Price? = null,
     val ready: String? = null,
     val showMultiplier: String? = null,
-    var isAdded: Boolean = false
+    var isAdded: Boolean = false,
+    var slabPrice: Int = 0
 )
 
 data class Feature (
@@ -52,7 +53,8 @@ data class Feature (
     val price: Price? = null,
     val ready: String? = null,
     val excludeInAll: Long? = null,
-    var isAdded: Boolean = false
+    var isAdded: Boolean = false,
+    var slabPrice: Int = 0
 )
 
 data class SubModule (

@@ -55,11 +55,24 @@ class ModuleListAdapter internal constructor(
                 binding.titleShortForm.text = item.name.toShortForm()
             }
 
-            val price = item.price?.slab1
-            if (price != null) {
+            var slabPrice = 0
+            if (item.slabPrice == 0) {
+                val slab1 = item.price?.slab1
+                if (slab1 != null) {
+                    try {
+                        slabPrice = slab1.toInt()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            } else {
+                slabPrice = item.slabPrice
+            }
+
+            if (slabPrice != 0) {
                 binding.linearPrice.visibility = View.VISIBLE
                 binding.btnAdd.visibility = View.VISIBLE
-                val priceText = "৳$price"
+                val priceText = "৳$slabPrice"
                 binding.price.text = priceText
             } else {
                 binding.linearPrice.visibility = View.GONE
