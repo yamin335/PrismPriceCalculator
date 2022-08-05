@@ -18,15 +18,12 @@ import kotlinx.coroutines.launch
 import net.store.divineit.BR
 import net.store.divineit.R
 import net.store.divineit.databinding.MainActivityBinding
-import net.store.divineit.models.BaseServiceModule
-import net.store.divineit.models.Feature
-import net.store.divineit.models.ModuleGroupSummary
-import net.store.divineit.models.ServiceModule
+import net.store.divineit.models.*
 import net.store.divineit.ui.BaseServiceModuleListAdapter
 import net.store.divineit.ui.ModuleGroupAdapter
 import net.store.divineit.ui.ModuleGroupSummaryListAdapter
 import net.store.divineit.ui.base.BaseActivity
-import net.store.divineit.ui.home.PricingViewModel
+import net.store.divineit.utils.AppConstants
 import net.store.divineit.ui.login.LoginActivity
 import java.io.*
 
@@ -46,26 +43,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     private lateinit var moduleSummaryAdapter: ModuleGroupSummaryListAdapter
     private var selectedBaseModulePosition = 0
     private lateinit var baseModuleList: List<BaseServiceModule>
-    private var summaryMap: HashMap<String, ModuleGroupSummary> = HashMap()
     private lateinit var multiplierListAdapter: MultiplierListAdapter
-
-    private var costSoftwareLicense = 0
-    private var costAdditionalUsers = 0
-    private var costImplementation = 0
-    private var costRequirementAnalysis = 0
-    private var costDeployment = 0
-    private var costConfiguration = 0
-    private var costOnsiteAdoptionSupport = 0
-    private var costTraining = 0
-    private var costProjectManagement = 0
-    private var costSoftwareCustomizationTotal = 0
-    private var costSoftwareCustomization = 0
-    private var costCustomizedReport = 0
-    private var costConsultancyServices = 0
-    private var costConsultancy = 0
-    private var costAnnualMaintenanceTotal = 0
-    private var costAnnualMaintenance = 0
-    private var costTotal = 0
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,16 +51,12 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
         setUpToolbar()
 
-        costAdditionalUsers = 150000
-        costDeployment = 10000
-        costAnnualMaintenance = 30000
-
         calculateSummaryCost(0)
         bindSummaryCostDataToUI()
 
         mDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent?): Boolean {
-                if(summarySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                if (summarySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     summarySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 } else {
                     summarySheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -204,8 +178,11 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         })
 
         binding.appBarMain.contentMain.summarySheet.btnSubmit.setOnClickListener {
+            if (summarySheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                summarySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
             if (preferencesHelper.isLoggedIn) {
-                viewModel.toastSuccess.postValue("Submitted Successfully!")
+                viewModel.submitSummary()
             } else {
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
@@ -223,6 +200,10 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         val baseModule = baseModuleList[selectedBaseModulePosition]
         var isAdded = false
         var price = 0
+
+        val summaryModuleFeatureList: ArrayList<SummaryModuleFeature> = ArrayList()
+        var summaryModuleTotalPrice = 0
+
         for (moduleGroup in baseModule.moduleGroups) {
             for (module in moduleGroup.modules) {
                 if (module.isAdded) {
@@ -241,6 +222,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                     }
 
                     price += slabPrice
+                    summaryModuleTotalPrice += slabPrice
+                    summaryModuleFeatureList.add(SummaryModuleFeature(code = module.code,
+                        multipliercode = "", price = slabPrice, prices = module.price, type = "module"))
                     isAdded = true
                 }
 
@@ -261,6 +245,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                         }
 
                         price += slabPrice
+                        summaryModuleTotalPrice += slabPrice
+                        summaryModuleFeatureList.add(SummaryModuleFeature(code = feature.code,
+                            multipliercode = "", price = slabPrice, prices = feature.price, type = "feature"))
                         isAdded = true
                     }
                 }
@@ -284,6 +271,10 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                             }
 
                             price += slabPrice
+                            price += slabPrice
+                            summaryModuleTotalPrice += slabPrice
+                            summaryModuleFeatureList.add(SummaryModuleFeature(code = feature.code,
+                                multipliercode = "", price = slabPrice, prices = feature.price, type = "feature"))
                             isAdded = true
                         }
                     }
@@ -292,15 +283,18 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         }
 
         if (isAdded) {
-            summaryMap[baseModule.code] = ModuleGroupSummary(baseModule.code, baseModule.name, price)
+            viewModel.summaryMap[baseModule.code] = ModuleGroupSummary(baseModule.code, baseModule.name, price)
+            viewModel.softwareLicenseModuleMap[baseModule.code] = SoftwareLicenseModule(name = baseModule. name,
+                totalamount = summaryModuleTotalPrice, code = baseModule.code, features = summaryModuleFeatureList)
         } else {
-            summaryMap.remove(baseModule.code)
+            viewModel.summaryMap.remove(key = baseModule.code)
+            viewModel.softwareLicenseModuleMap.remove(key = baseModule.code)
         }
 
         var moduleCost = 0
         val moduleSummaryList: ArrayList<ModuleGroupSummary> = ArrayList()
-        for (key in summaryMap.keys) {
-            val item = summaryMap[key] ?: continue
+        for (key in viewModel.summaryMap.keys) {
+            val item = viewModel.summaryMap[key] ?: continue
             moduleSummaryList.add(item)
             moduleCost += item.price
         }
@@ -320,69 +314,82 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     }
 
     private fun calculateSummaryCost(moduleCost: Int) {
-        costSoftwareLicense = moduleCost + costAdditionalUsers
+        viewModel.costSoftwareLicense = moduleCost + viewModel.costAdditionalUsers
 
-        costImplementation = costRequirementAnalysis + costDeployment + costConfiguration + costOnsiteAdoptionSupport + costTraining + costProjectManagement
+        viewModel.costRequirementAnalysis = (viewModel.costSoftwareLicense * AppConstants.percentRequirementAnalysis) / 100
+        viewModel.costDeployment = (viewModel.costSoftwareLicense * AppConstants.percentDeployment) / 100
+        viewModel.costOnsiteAdoptionSupport = (viewModel.costSoftwareLicense * AppConstants.percentOnSiteAdoption) / 100
+        viewModel.costTraining = (viewModel.costSoftwareLicense * AppConstants.percentTraining) / 100
+        viewModel.costProjectManagement = (viewModel.costSoftwareLicense * AppConstants.percentProjectManagement) / 100
 
-        costSoftwareCustomizationTotal = costSoftwareCustomization + costCustomizedReport
+        viewModel.costImplementation = viewModel.costRequirementAnalysis +
+                viewModel.costDeployment + viewModel.costConfiguration +
+                viewModel.costOnsiteAdoptionSupport +
+                viewModel.costTraining + viewModel.costProjectManagement
 
-        costConsultancyServices = costConsultancy
+        viewModel.costSoftwareCustomizationTotal = viewModel.costSoftwareCustomization + viewModel.costCustomizedReport
 
-        costAnnualMaintenanceTotal = costAnnualMaintenance
+        viewModel.costConsultancy = (viewModel.costSoftwareLicense * AppConstants.percentConsultancy) / 100
 
-        costTotal = costSoftwareLicense + costImplementation + costSoftwareCustomizationTotal + costConsultancyServices + costAnnualMaintenanceTotal
+        viewModel.costConsultancyServices = viewModel.costConsultancy
+
+        viewModel.costAnnualMaintenance = (viewModel.costSoftwareLicense * AppConstants.percentMaintenance) / 100
+
+        viewModel.costAnnualMaintenanceTotal = viewModel.costAnnualMaintenance
+
+        viewModel.costTotal = viewModel.costSoftwareLicense + viewModel.costImplementation + viewModel.costSoftwareCustomizationTotal + viewModel.costConsultancyServices + viewModel.costAnnualMaintenanceTotal
     }
 
     private fun bindSummaryCostDataToUI() {
-        val costSoftwareLicenseText = if (costSoftwareLicense > 0) "৳$costSoftwareLicense" else "-"
+        val costSoftwareLicenseText = if (viewModel.costSoftwareLicense > 0) "৳${viewModel.costSoftwareLicense}" else "-"
         binding.appBarMain.contentMain.summarySheet.costSoftwareLicense.text = costSoftwareLicenseText
 
-        val costAdditionalUsersText = if (costAdditionalUsers > 0) "৳$costAdditionalUsers" else "-"
+        val costAdditionalUsersText = if (viewModel.costAdditionalUsers > 0) "৳${viewModel.costAdditionalUsers}" else "-"
         binding.appBarMain.contentMain.summarySheet.costAdditionalUsers.text = costAdditionalUsersText
 
-        val costImplementationText = if (costImplementation > 0) "৳$costImplementation" else "-"
+        val costImplementationText = if (viewModel.costImplementation > 0) "৳${viewModel.costImplementation}" else "-"
         binding.appBarMain.contentMain.summarySheet.costImplementation.text = costImplementationText
 
-        val costRequirementAnalysisText = if (costRequirementAnalysis > 0) "৳$costRequirementAnalysis" else "-"
+        val costRequirementAnalysisText = if (viewModel.costRequirementAnalysis > 0) "৳${viewModel.costRequirementAnalysis}" else "-"
         binding.appBarMain.contentMain.summarySheet.costRequirementAnalysis.text = costRequirementAnalysisText
 
-        val costDeploymentText = if (costDeployment > 0) "৳$costDeployment" else "-"
+        val costDeploymentText = if (viewModel.costDeployment > 0) "৳${viewModel.costDeployment}" else "-"
         binding.appBarMain.contentMain.summarySheet.costDeployment.text = costDeploymentText
 
-        val costConfigurationText = if (costConfiguration > 0) "৳$costConfiguration" else "-"
+        val costConfigurationText = if (viewModel.costConfiguration > 0) "৳${viewModel.costConfiguration}" else "-"
         binding.appBarMain.contentMain.summarySheet.costConfiguration.text = costConfigurationText
 
-        val costOnsiteAdoptionSupportText = if (costOnsiteAdoptionSupport > 0) "৳$costOnsiteAdoptionSupport" else "-"
+        val costOnsiteAdoptionSupportText = if (viewModel.costOnsiteAdoptionSupport > 0) "৳${viewModel.costOnsiteAdoptionSupport}" else "-"
         binding.appBarMain.contentMain.summarySheet.costOnsiteAdoptionSupport.text = costOnsiteAdoptionSupportText
 
-        val costTrainingText = if (costTraining > 0) "৳$costTraining" else "-"
+        val costTrainingText = if (viewModel.costTraining > 0) "৳${viewModel.costTraining}" else "-"
         binding.appBarMain.contentMain.summarySheet.costTraining.text = costTrainingText
 
-        val costProjectManagementText = if (costProjectManagement > 0) "৳$costProjectManagement" else "-"
+        val costProjectManagementText = if (viewModel.costProjectManagement > 0) "৳${viewModel.costProjectManagement}" else "-"
         binding.appBarMain.contentMain.summarySheet.costProjectManagement.text = costProjectManagementText
 
-        val costSoftwareCustomizationTotalText = if (costSoftwareCustomizationTotal > 0) "৳$costSoftwareCustomizationTotal" else "-"
+        val costSoftwareCustomizationTotalText = if (viewModel.costSoftwareCustomizationTotal > 0) "৳${viewModel.costSoftwareCustomizationTotal}" else "-"
         binding.appBarMain.contentMain.summarySheet.costSoftwareCustomizationTotal.text = costSoftwareCustomizationTotalText
 
-        val costSoftwareCustomizationText = if (costSoftwareCustomization > 0) "৳$costSoftwareCustomization" else "-"
+        val costSoftwareCustomizationText = if (viewModel.costSoftwareCustomization > 0) "৳${viewModel.costSoftwareCustomization}" else "-"
         binding.appBarMain.contentMain.summarySheet.costSoftwareCustomization.text = costSoftwareCustomizationText
 
-        val costCustomizedReportText = if (costCustomizedReport > 0) "৳$costCustomizedReport" else "-"
+        val costCustomizedReportText = if (viewModel.costCustomizedReport > 0) "৳${viewModel.costCustomizedReport}" else "-"
         binding.appBarMain.contentMain.summarySheet.costCustomizedReport.text = costCustomizedReportText
 
-        val costConsultancyServicesText = if (costConsultancyServices > 0) "৳$costConsultancyServices" else "-"
+        val costConsultancyServicesText = if (viewModel.costConsultancyServices > 0) "৳${viewModel.costConsultancyServices}" else "-"
         binding.appBarMain.contentMain.summarySheet.costConsultancyServices.text = costConsultancyServicesText
 
-        val costConsultancyText = if (costConsultancy > 0) "৳$costConsultancy" else "-"
+        val costConsultancyText = if (viewModel.costConsultancy > 0) "৳${viewModel.costConsultancy}" else "-"
         binding.appBarMain.contentMain.summarySheet.costConsultancy.text = costConsultancyText
 
-        val costAnnualMaintenanceTotalText = if (costAnnualMaintenanceTotal > 0) "৳$costAnnualMaintenanceTotal" else "-"
+        val costAnnualMaintenanceTotalText = if (viewModel.costAnnualMaintenanceTotal > 0) "৳${viewModel.costAnnualMaintenanceTotal}" else "-"
         binding.appBarMain.contentMain.summarySheet.costAnnualMaintenanceTotal.text = costAnnualMaintenanceTotalText
 
-        val costAnnualMaintenanceText = if (costAnnualMaintenance > 0) "৳$costAnnualMaintenance" else "-"
+        val costAnnualMaintenanceText = if (viewModel.costAnnualMaintenance > 0) "৳${viewModel.costAnnualMaintenance}" else "-"
         binding.appBarMain.contentMain.summarySheet.costAnnualMaintenance.text = costAnnualMaintenanceText
 
-        val costTotalText = if (costTotal > 0) "৳$costTotal" else "-"
+        val costTotalText = if (viewModel.costTotal > 0) "৳${viewModel.costTotal}" else "-"
         binding.appBarMain.contentMain.summarySheet.costTotal.text = costTotalText
     }
 

@@ -1,26 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <com.google.android.material.appbar.AppBarLayout
+<layout>
+    <data>
+        <variable
+            name="viewModel"
+            type="net.store.divineit.ui.main.MainActivityViewModel" />
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.PrismPriceCalculator.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.PrismPriceCalculator.PopupOverlay" />
+            android:layout_height="wrap_content"
+            android:theme="@style/Theme.PrismPriceCalculator.AppBarOverlay">
 
-    </com.google.android.material.appbar.AppBarLayout>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/Theme.PrismPriceCalculator.PopupOverlay" />
 
-    <include
-        android:id="@+id/contentMain"
-        layout="@layout/content_main"/>
+        </com.google.android.material.appbar.AppBarLayout>
+        <ProgressBar
+            android:id="@+id/loader"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:layout_below="@id/appBarLayout"
+            android:layout_marginTop="-10dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/blue3"
+            app:showLoader="@{viewModel.apiCallStatus}"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        <include
+            android:id="@+id/contentMain"
+            layout="@layout/content_main"/>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

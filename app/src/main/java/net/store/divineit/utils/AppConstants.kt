@@ -3,4 +3,13 @@ package net.store.divineit.utils
 object AppConstants {
     const val PASSWORD_VALID_LENGTH = 4
     const val PREF_NAME = "PrismPricePrefs"
+
+    const val percentRequirementAnalysis = 10
+    const val percentDeployment = 5
+    const val percentOnSiteAdoption = 5
+    const val percentTraining = 3
+    const val percentProjectManagement = 10
+    const val percentConsultancy = 10
+    const val percentMaintenance = 20
+
 }

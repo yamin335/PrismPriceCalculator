@@ -6,6 +6,12 @@ import android.graphics.Color
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import java.math.BigDecimal
+import java.math.RoundingMode
+
+fun Double.roundTo(digit: Int): Double {
+    return BigDecimal(this).setScale(digit, RoundingMode.HALF_UP).toDouble()
+}
 
 fun String?.isValidEmail(): Boolean {
     return android.util.Patterns.EMAIL_ADDRESS.matcher(this ?: "").matches()

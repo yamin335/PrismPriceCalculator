@@ -19,7 +19,8 @@ object Api {
 object ApiEndPoint {
     const val LOGIN = "$API_VERSION/$AUTH_REPO/login"
     const val SIGNUP = "$API_VERSION/$AUTH_REPO/registercustomer"
-    const val ALL_Product = "$API_VERSION/$PRODUCT_REPO/allactive"
+    const val ALL_PRODUCTS = "$API_VERSION/$PRODUCT_REPO/allactive"
+    const val QUOTATION_SUBMIT = "$API_VERSION/quotation/submit"
 }
 
 object ResponseCodes {

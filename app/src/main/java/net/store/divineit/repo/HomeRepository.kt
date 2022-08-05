@@ -1,12 +1,12 @@
 package net.store.divineit.repo
 
+import com.google.gson.Gson
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.store.divineit.api.ApiService
-import net.store.divineit.models.AllProductsResponse
-import net.store.divineit.models.LoginResponse
-import net.store.divineit.models.SignUpResponse
+import net.store.divineit.models.*
 import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,10 +15,17 @@ import javax.inject.Singleton
 class HomeRepository @Inject constructor(
     private val apiService: ApiService
     ) {
-
     suspend fun allProducts(): Response<AllProductsResponse> {
         return withContext(Dispatchers.IO) {
             apiService.allProducts()
+        }
+    }
+
+    suspend fun submitQuotation(summaryStoreBody: SummaryStoreModel): Response<SummaryResponse> {
+        val jsonObject = Gson().toJson(summaryStoreBody)
+
+        return withContext(Dispatchers.IO) {
+            apiService.submitQuotation(jsonObject)
         }
     }
 }
