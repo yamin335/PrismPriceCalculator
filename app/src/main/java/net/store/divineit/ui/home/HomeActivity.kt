@@ -12,6 +12,7 @@ import net.store.divineit.databinding.HomeActivityBinding
 import net.store.divineit.ui.AllProductsListAdapter
 import net.store.divineit.ui.base.BaseActivity
 import net.store.divineit.ui.login.LoginActivity
+import net.store.divineit.ui.main.MainActivity
 
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
@@ -34,6 +35,7 @@ class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
         setUpToolbar()
 
         serviceAdapter = AllProductsListAdapter {
+            PricingActivity.productId = it.id ?: ""
             startActivity(Intent(this@HomeActivity, PricingActivity::class.java))
             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }

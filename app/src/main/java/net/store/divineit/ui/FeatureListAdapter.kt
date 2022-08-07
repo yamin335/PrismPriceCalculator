@@ -42,17 +42,17 @@ class FeatureListAdapter internal constructor(
             binding.item = item
 
             var slabPrice = 0
-            if (item.slabPrice == 0) {
-                val slab1 = item.price?.slab1
-                if (slab1 != null) {
-                    try {
-                        slabPrice = slab1.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+            if (item.defaultprice == 0.0) {
+                if (item.price.isEmpty()) return
+                val featurePrice = item.price[0]
+                if (featurePrice.isBlank()) return
+                try {
+                    slabPrice = featurePrice.toDouble().toInt()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             } else {
-                slabPrice = item.slabPrice
+                slabPrice = item.defaultprice.toInt()
             }
 
             if (slabPrice != 0) {

@@ -28,4 +28,14 @@ class HomeRepository @Inject constructor(
             apiService.submitQuotation(jsonObject)
         }
     }
+
+    suspend fun productDetails(productId: String): Response<ServiceModuleResponse> {
+        val jsonObject = JsonObject().apply {
+            addProperty("productid", productId)
+        }.toString()
+
+        return withContext(Dispatchers.IO) {
+            apiService.productDetails(jsonObject)
+        }
+    }
 }

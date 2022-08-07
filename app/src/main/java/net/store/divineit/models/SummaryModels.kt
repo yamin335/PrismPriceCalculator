@@ -33,7 +33,7 @@ data class SummaryModuleFeature (
     val code: String?,
     val multipliercode: String?,
     val price: Int?,
-    val prices: Price?,
+    val prices: List<String>,
     val type: String?
 )
 

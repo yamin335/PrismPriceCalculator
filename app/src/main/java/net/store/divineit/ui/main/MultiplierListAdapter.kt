@@ -45,117 +45,61 @@ class MultiplierListAdapter internal constructor(
             val mContext = binding.root.context
             binding.chipGroup.removeAllViews()
 
-            if (item.slabConfig.inputType == "slider") {
+            if (item.slabConfig?.inputType == "slider") {
                 binding.linearSlider.visibility = View.VISIBLE
                 if (item.slabs.isEmpty()) {
                     binding.linearSlider.visibility = View.GONE
                     return
                 }
 
-                val sliderMaxRange = when (val maxRange = item.slabs[0]) {
-                    is Int -> {
-                        maxRange.toInt()
-                    }
-                    is Double -> {
-                        maxRange.toInt()
-                    }
-                    else -> {
-                        10
-                    }
+                var sliderMaxRange = 10.0
+
+                try {
+                    sliderMaxRange = item.slabs[0].toDouble()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
 
                 binding.slider.valueTo = sliderMaxRange.toFloat()
 
                 binding.maxText.text = "MAX ($sliderMaxRange)"
 
-                val sliderStepSize = when (val stepSize = item.slabConfig.increment) {
-                    is Int -> {
-                        stepSize.toInt()
-                    }
-                    is Double -> {
-                        stepSize.toInt()
-                    }
-                    else -> {
-                        1
-                    }
-                }
+                val sliderStepSize = item.slabConfig.increment ?: 1
 
                 binding.slider.stepSize = sliderStepSize.toFloat()
             } else {
                 binding.linearSlider.visibility = View.GONE
                 for ((index, slab) in item.slabs.withIndex()) {
                     var prefix = ""
-                    if (item.slabConfig.slabTexts.size > index) {
-                        prefix = item.slabConfig.slabTexts[index].title ?: ""
+                    if (item.slabTexts.size > index) {
+                        prefix = item.slabTexts[index]
                     }
 
-                    val startRange = when (item.slabConfig.increment) {
-                        is Int -> {
-                            val increment = item.slabConfig.increment.toInt()
-                            var startItem = increment
-                            if (index > 0) {
-                                val previousItem = when (val temp = item.slabs[index - 1]) {
-                                    is Int -> {
-                                        temp.toInt()
-                                    }
-                                    is Double -> {
-                                        temp.toInt()
-                                    }
-                                    else -> {
-                                        0
-                                    }
-                                }
-                                startItem = previousItem + increment
-                            }
-                            startItem
-                        }
-                        is Double -> {
-                            val increment = item.slabConfig.increment.toInt()
-                            var startItem = increment
-                            if (index > 0) {
-                                val previousItem = when (val temp = item.slabs[index - 1]) {
-                                    is Int -> {
-                                        temp.toInt()
-                                    }
-                                    is Double -> {
-                                        temp.toInt()
-                                    }
-                                    else -> {
-                                        0
-                                    }
-                                }
-                                startItem = previousItem + increment
-                            }
-                            startItem
-                        }
-                        else -> {
-                            -1
-                        }
+                    val increment = item.slabConfig?.increment ?: 0
+                    var startItem = increment
+
+                    if (index > 0) {
+                        val previousItem = item.slabs[index - 1].toDouble().toInt()
+                        startItem = previousItem + increment
                     }
 
-                    val slabText = when (slab) {
-                        is Int -> {
-                            if (prefix.isBlank()) {
-                                if (startRange == -1 || startRange == slab.toInt()) "${slab.toInt()}" else "$startRange-${slab.toInt()}"
-                            } else {
-                                if (startRange == -1 || startRange == slab.toInt()) "$prefix(${slab.toInt()})" else "$prefix($startRange-${slab.toInt()})"
-                            }
+                    try {
+                        val slabPrice = slab.toDouble().toInt()
+                        val slabText = if (prefix.isBlank()) {
+                            if (startItem == slabPrice) "$slabPrice" else "$startItem-${slabPrice}"
+                        } else {
+                            if (startItem == slabPrice) "$prefix(${slabPrice})" else "$prefix($startItem-${slabPrice})"
                         }
-                        is Double -> {
-                            if (prefix.isBlank()) {
-                                if (startRange == -1 || startRange == slab.toInt()) "${slab.toInt()}" else "$startRange-${slab.toInt()}"
-                            } else {
-                                if (startRange == -1 || startRange == slab.toInt()) "$prefix(${slab.toInt()})" else "$prefix($startRange-${slab.toInt()})"
-                            }
-                        }
-                        else -> slab.toString()
+                        binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
                     }
-                    binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
                 }
 
                 binding.chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
                     if (checkedIds.size == 1) {
-                        callback(checkedIds[0], item.code, position)
+                        callback(checkedIds[0], item.code ?: "", position)
                     }
                 }
             }

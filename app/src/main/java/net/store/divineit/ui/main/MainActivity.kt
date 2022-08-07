@@ -29,6 +29,9 @@ import java.io.*
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() {
+    companion object {
+        var productId: String = ""
+    }
     override val bindingVariable: Int
         get() = BR.viewModel
     override val layoutId: Int
@@ -42,7 +45,6 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     private lateinit var mDetector: GestureDetector
     private lateinit var moduleSummaryAdapter: ModuleGroupSummaryListAdapter
     private var selectedBaseModulePosition = 0
-    private lateinit var baseModuleList: List<BaseServiceModule>
     private lateinit var multiplierListAdapter: MultiplierListAdapter
 
     @SuppressLint("ClickableViewAccessibility")
@@ -65,62 +67,14 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             }
         })
 
-//        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar,
-//            R.string.open,
-//            R.string.close
-//        ) {
-//            override fun onDrawerClosed(drawerView: View) {
-//                super.onDrawerClosed(drawerView)
-//            }
-//
-//            override fun onDrawerOpened(drawerView: View) {
-//                super.onDrawerOpened(drawerView)
-//            }
-//        }
-//        binding.drawerLayout.addDrawerListener(mDrawerToggle)
-
-        val inputStream: InputStream = resources.openRawResource(R.raw.divine)
-        val writer: Writer = StringWriter()
-        val buffer = CharArray(1024)
-        inputStream.use { stream ->
-            val reader: Reader = BufferedReader(InputStreamReader(stream, "UTF-8"))
-            var n: Int
-            while (reader.read(buffer).also { n = it } != -1) {
-                writer.write(buffer, 0, n)
-            }
-        }
-
-        val jsonString: String = writer.toString()
-        baseModuleList = Gson().fromJson(jsonString, Array<BaseServiceModule>::class.java).toList()
-
-        if (baseModuleList.isEmpty()) return
-
         moduleSummaryAdapter = ModuleGroupSummaryListAdapter()
         binding.appBarMain.contentMain.summarySheet.recyclerSummary.adapter = moduleSummaryAdapter
 
-        moduleGroupAdapter = ModuleGroupAdapter(baseModuleList[0].code, baseModuleList[0].moduleGroups) {
-            calculateSummary()
-        }
-
-        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-        innerLLM.initialPrefetchItemCount = 3
-
-        binding.appBarMain.contentMain.recyclerView.apply {
-            isNestedScrollingEnabled = false
-            setHasFixedSize(true)
-            layoutManager = innerLLM
-            adapter = moduleGroupAdapter
-        }
-
         multiplierListAdapter = MultiplierListAdapter { index, multiplierCode, position ->
-            baseModuleList[selectedBaseModulePosition].moduleGroups[0].multipliers[position].slabIndex = index
+            viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabIndex = index
             calculateModuleAndFeaturePrice(Pair(index, multiplierCode))
             calculateSummary()
             moduleGroupAdapter.notifyDataSetChanged()
-//            CoroutineScope(Dispatchers.Main.immediate).launch {
-//                delay(250)
-//                calculateSummary()
-//            }
         }
 
         binding.appBarMain.contentMain.multipliers.apply {
@@ -128,23 +82,42 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             adapter = multiplierListAdapter
         }
 
-        baseServiceAdapter = BaseServiceModuleListAdapter(baseModuleList) { baseModule, position ->
-            loadHeaderMultipliers(baseModule)
-            selectedBaseModulePosition = position
-            binding.drawerLayout.closeDrawer(GravityCompat.END)
-            CoroutineScope(Dispatchers.Main.immediate).launch {
-                delay(250)
-                moduleGroupAdapter = ModuleGroupAdapter(baseModule.code, baseModule.moduleGroups) {
+        viewModel.baseModuleListTemp.observe(this) { baseModuleList ->
+            baseModuleList?.let {
+                viewModel.baseModuleList = baseModuleList as ArrayList<BaseServiceModule>
+                baseServiceAdapter = BaseServiceModuleListAdapter(viewModel.baseModuleList) { baseModule, position ->
+                    loadHeaderMultipliers(baseModule)
+                    selectedBaseModulePosition = position
+                    binding.drawerLayout.closeDrawer(GravityCompat.END)
+                    CoroutineScope(Dispatchers.Main.immediate).launch {
+                        delay(250)
+                        moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[selectedBaseModulePosition].code ?: "", viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups ?: ArrayList()) {
+                            calculateSummary()
+                        }
+                        binding.appBarMain.contentMain.recyclerView.apply {
+                            adapter = moduleGroupAdapter
+                        }
+                    }
+                }
+                binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
+                if (it.isEmpty()) return@observe
+                loadHeaderMultipliers(it[0])
+
+                moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[0].code ?: "", viewModel.baseModuleList[0].moduleGroups ?: ArrayList()) {
                     calculateSummary()
                 }
+
+                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+                innerLLM.initialPrefetchItemCount = 3
+
                 binding.appBarMain.contentMain.recyclerView.apply {
+                    isNestedScrollingEnabled = false
+                    setHasFixedSize(true)
+                    layoutManager = innerLLM
                     adapter = moduleGroupAdapter
                 }
             }
         }
-        binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
-
-        loadHeaderMultipliers(baseModuleList[0])
 
         summarySheetBehavior = BottomSheetBehavior.from(binding.appBarMain.contentMain.summarySheet.root)
 
@@ -188,6 +161,36 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
             }
         }
+
+        viewModel.productDetails(productId)
+
+        //        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar,
+//            R.string.open,
+//            R.string.close
+//        ) {
+//            override fun onDrawerClosed(drawerView: View) {
+//                super.onDrawerClosed(drawerView)
+//            }
+//
+//            override fun onDrawerOpened(drawerView: View) {
+//                super.onDrawerOpened(drawerView)
+//            }
+//        }
+//        binding.drawerLayout.addDrawerListener(mDrawerToggle)
+
+//        val inputStream: InputStream = resources.openRawResource(R.raw.divine)
+//        val writer: Writer = StringWriter()
+//        val buffer = CharArray(1024)
+//        inputStream.use { stream ->
+//            val reader: Reader = BufferedReader(InputStreamReader(stream, "UTF-8"))
+//            var n: Int
+//            while (reader.read(buffer).also { n = it } != -1) {
+//                writer.write(buffer, 0, n)
+//            }
+//        }
+//
+//        val jsonString: String = writer.toString()
+//        baseModuleList = Gson().fromJson(jsonString, Array<BaseServiceModule>::class.java).toList()
     }
 
     private fun setUpToolbar() {
@@ -197,7 +200,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     }
 
     private fun calculateSummary() {
-        val baseModule = baseModuleList[selectedBaseModulePosition]
+        val baseModule = viewModel.baseModuleList[selectedBaseModulePosition]
         var isAdded = false
         var price = 0
 
@@ -208,17 +211,17 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             for (module in moduleGroup.modules) {
                 if (module.isAdded) {
                     var slabPrice = 0
-                    if (module.slabPrice == 0) {
-                        val slab1 = module.price?.slab1
-                        if (slab1 != null) {
-                            try {
-                                slabPrice = slab1.toInt()
-                            } catch (e: Exception) {
-                                continue
-                            }
+                    if (module.defaultprice == 0.0) {
+                        if (module.price.isEmpty()) return
+                        val modulePrice = module.price[0]
+                        if (modulePrice.isBlank()) return
+                        try {
+                            slabPrice = modulePrice.toDouble().toInt()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     } else {
-                        slabPrice = module.slabPrice
+                        slabPrice = module.defaultprice.toInt()
                     }
 
                     price += slabPrice
@@ -231,17 +234,17 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 for (feature in module.features) {
                     if (feature.isAdded) {
                         var slabPrice = 0
-                        if (feature.slabPrice == 0) {
-                            val slab1 = feature.price?.slab1
-                            if (slab1 != null) {
-                                try {
-                                    slabPrice = slab1.toInt()
-                                } catch (e: Exception) {
-                                    continue
-                                }
+                        if (feature.defaultprice == 0.0) {
+                            if (feature.price.isEmpty()) return
+                            val featurePrice = feature.price[0]
+                            if (featurePrice.isBlank()) return
+                            try {
+                                slabPrice = featurePrice.toDouble().toInt()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
                         } else {
-                            slabPrice = feature.slabPrice
+                            slabPrice = feature.defaultprice.toInt()
                         }
 
                         price += slabPrice
@@ -251,40 +254,12 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                         isAdded = true
                     }
                 }
-
-                for (subModule in module.submodules) {
-                    val features = subModule.features
-                    for (feature in features) {
-                        if (feature.isAdded) {
-                            var slabPrice = 0
-                            if (feature.slabPrice == 0) {
-                                val slab1 = feature.price?.slab1
-                                if (slab1 != null) {
-                                    try {
-                                        slabPrice = slab1.toInt()
-                                    } catch (e: Exception) {
-                                        continue
-                                    }
-                                }
-                            } else {
-                                slabPrice = feature.slabPrice
-                            }
-
-                            price += slabPrice
-                            price += slabPrice
-                            summaryModuleTotalPrice += slabPrice
-                            summaryModuleFeatureList.add(SummaryModuleFeature(code = feature.code,
-                                multipliercode = "", price = slabPrice, prices = feature.price, type = "feature"))
-                            isAdded = true
-                        }
-                    }
-                }
             }
         }
 
         if (isAdded) {
-            viewModel.summaryMap[baseModule.code] = ModuleGroupSummary(baseModule.code, baseModule.name, price)
-            viewModel.softwareLicenseModuleMap[baseModule.code] = SoftwareLicenseModule(name = baseModule. name,
+            viewModel.summaryMap[baseModule.code ?: ""] = ModuleGroupSummary(baseModule.code ?: "", baseModule.name ?: "", price)
+            viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SoftwareLicenseModule(name = baseModule. name,
                 totalamount = summaryModuleTotalPrice, code = baseModule.code, features = summaryModuleFeatureList)
         } else {
             viewModel.summaryMap.remove(key = baseModule.code)
@@ -309,7 +284,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
         binding.appBarMain.contentMain.linearHeader.visibility = if (baseModule.moduleGroups[0].multipliers.isEmpty()) View.GONE else View.VISIBLE
         multiplierListAdapter.submitList(baseModule.moduleGroups[0].multipliers.filter {
-            return@filter it.label.isNotBlank() && it.slabConfig.hideInApp != true
+            return@filter (it.label?.isNotBlank() == true) && it.slabConfig?.hideInApp != true
         })
     }
 
@@ -394,24 +369,17 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     }
 
     private fun calculateModuleAndFeaturePrice(pair: Pair<Int, String>) {
-        for (groupIndex in baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
-            for (moduleIndex in baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.indices) {
-                val moduleMultiplierCode = baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].price?.multiplier
+        for (groupIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
+            for (moduleIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.indices) {
+                val moduleMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].multiplier
                 if (moduleMultiplierCode is String && moduleMultiplierCode == pair.second) {
-                    calculateModulePrice(baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex], pair.first)
+                    calculateModulePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex], pair.first)
                 }
-                for (subModuleIndex in baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].submodules.indices) {
-                    for (subModuleFeatureIndex in baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].submodules[subModuleIndex].features.indices) {
-                        val subModuleFeatureMultiplierCode = baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].submodules[subModuleIndex].features[subModuleFeatureIndex].price?.multiplier
-                        if (subModuleFeatureMultiplierCode is String && moduleMultiplierCode == pair.second) {
-                            calculateFeaturePrice(baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].submodules[subModuleIndex].features[subModuleFeatureIndex], pair.first)
-                        }
-                    }
-                }
-                for (featureIndex in baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.indices) {
-                    val featureMultiplierCode = baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].price?.multiplier
+
+                for (featureIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.indices) {
+                    val featureMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].multiplier
                     if (featureMultiplierCode is String && moduleMultiplierCode == pair.second) {
-                        calculateFeaturePrice(baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex], pair.first)
+                        calculateFeaturePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex], pair.first)
                     }
                 }
             }
@@ -419,152 +387,24 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     }
 
     private fun calculateModulePrice(module:  ServiceModule, index: Int) {
-        when (index) {
-            0 -> {
-                val slab1 = module.price?.slab1
-                if (slab1 != null) {
-                    try {
-                        module.slabPrice = slab1.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            1 -> {
-                val slab2 = module.price?.slab2
-                if (slab2 != null) {
-                    try {
-                        module.slabPrice = slab2.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            2 -> {
-                val slab3 = module.price?.slab3
-                if (slab3 != null) {
-                    try {
-                        module.slabPrice = slab3.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            3 -> {
-                val slab4 = module.price?.slab4
-                if (slab4 != null) {
-                    try {
-                        module.slabPrice = slab4.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            4 -> {
-                val slab5 = module.price?.slab5
-                if (slab5 != null) {
-                    try {
-                        module.slabPrice = slab5.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            5 -> {
-                val slab6 = module.price?.slab6
-                if (slab6 != null) {
-                    try {
-                        module.slabPrice = slab6.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            6 -> {
-                val slab7 = module.price?.slab7
-                if (slab7 != null) {
-                    try {
-                        module.slabPrice = slab7.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+        if (module.price.size <= index) return
+        val price = module.price[index]
+        if (price.isBlank()) return
+        try {
+            module.defaultprice = price.toDouble()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     private fun calculateFeaturePrice(feature:  Feature, index: Int) {
-        when (index) {
-            0 -> {
-                val slab1 = feature.price?.slab1
-                if (slab1 != null) {
-                    try {
-                        feature.slabPrice = slab1.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            1 -> {
-                val slab2 = feature.price?.slab2
-                if (slab2 != null) {
-                    try {
-                        feature.slabPrice = slab2.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            2 -> {
-                val slab3 = feature.price?.slab3
-                if (slab3 != null) {
-                    try {
-                        feature.slabPrice = slab3.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            3 -> {
-                val slab4 = feature.price?.slab4
-                if (slab4 != null) {
-                    try {
-                        feature.slabPrice = slab4.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            4 -> {
-                val slab5 = feature.price?.slab5
-                if (slab5 != null) {
-                    try {
-                        feature.slabPrice = slab5.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            5 -> {
-                val slab6 = feature.price?.slab6
-                if (slab6 != null) {
-                    try {
-                        feature.slabPrice = slab6.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            6 -> {
-                val slab7 = feature.price?.slab7
-                if (slab7 != null) {
-                    try {
-                        feature.slabPrice = slab7.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+        if (feature.price.size <= index) return
+        val price = feature.price[index]
+        if (price.isBlank()) return
+        try {
+            feature.defaultprice = price.toDouble()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

@@ -56,17 +56,17 @@ class ModuleListAdapter internal constructor(
             }
 
             var slabPrice = 0
-            if (item.slabPrice == 0) {
-                val slab1 = item.price?.slab1
-                if (slab1 != null) {
-                    try {
-                        slabPrice = slab1.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+            if (item.defaultprice == 0.0) {
+                if (item.price.isEmpty()) return
+                val modulePrice = item.price[0]
+                if (modulePrice.isBlank()) return
+                try {
+                    slabPrice = modulePrice.toDouble().toInt()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             } else {
-                slabPrice = item.slabPrice
+                slabPrice = item.defaultprice.toInt()
             }
 
             if (slabPrice != 0) {
@@ -79,38 +79,38 @@ class ModuleListAdapter internal constructor(
                 binding.btnAdd.visibility = View.GONE
             }
 
-            val subModuleListAdapter = SubModuleListAdapter(dataList[position].submodules) {
-                if (!dataList[position].isAdded) {
-                    for (subModule in dataList[position].submodules) {
-                        for (feature in subModule.features) {
-                            if (feature.isAdded) {
-                                dataList[position].isAdded = true
-                                break
-                            }
-                        }
-                        if (dataList[position].isAdded) {
-                            break
-                        }
-                    }
-
-                    if (dataList[position].isAdded) {
-                        moduleChangeCallback()
-                    } else {
-                        callback(dataList[position])
-                    }
-                } else {
-                    callback(dataList[position])
-                }
-            }
-            val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-            innerLLM.initialPrefetchItemCount = 2
-
-            binding.recyclerSubModule.apply {
-                isNestedScrollingEnabled = false
-                setHasFixedSize(true)
-                layoutManager = innerLLM
-                adapter = subModuleListAdapter
-            }
+//            val subModuleListAdapter = SubModuleListAdapter(dataList[position].submodules) {
+//                if (!dataList[position].isAdded) {
+//                    for (subModule in dataList[position].submodules) {
+//                        for (feature in subModule.features) {
+//                            if (feature.isAdded) {
+//                                dataList[position].isAdded = true
+//                                break
+//                            }
+//                        }
+//                        if (dataList[position].isAdded) {
+//                            break
+//                        }
+//                    }
+//
+//                    if (dataList[position].isAdded) {
+//                        moduleChangeCallback()
+//                    } else {
+//                        callback(dataList[position])
+//                    }
+//                } else {
+//                    callback(dataList[position])
+//                }
+//            }
+//            val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+//            innerLLM.initialPrefetchItemCount = 2
+//
+//            binding.recyclerSubModule.apply {
+//                isNestedScrollingEnabled = false
+//                setHasFixedSize(true)
+//                layoutManager = innerLLM
+//                adapter = subModuleListAdapter
+//            }
             //subModuleListAdapter.submitList(item.submodules)
 
             val featureListAdapter = FeatureListAdapter(dataList[position].features) {
@@ -159,11 +159,11 @@ class ModuleListAdapter internal constructor(
                         feature.isAdded = false
                     }
 
-                    for (subModule in dataList[position].submodules) {
-                        for (feature in subModule.features) {
-                            feature.isAdded = false
-                        }
-                    }
+//                    for (subModule in dataList[position].submodules) {
+//                        for (feature in subModule.features) {
+//                            feature.isAdded = false
+//                        }
+//                    }
                 }
                 moduleChangeCallback()
             }

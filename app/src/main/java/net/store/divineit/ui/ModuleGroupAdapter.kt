@@ -171,11 +171,11 @@ class ModuleGroupAdapter internal constructor(
                     if (!feature.isAdded) feature.isAdded = true
                 }
 
-                for (subModule in module.submodules) {
-                    for (feature in subModule.features) {
-                        if (!feature.isAdded) feature.isAdded = true
-                    }
-                }
+//                for (subModule in module.submodules) {
+//                    for (feature in subModule.features) {
+//                        if (!feature.isAdded) feature.isAdded = true
+//                    }
+//                }
             }
             notifyItemChanged(position)
             callback(dataList[position])
@@ -189,12 +189,12 @@ class ModuleGroupAdapter internal constructor(
                     isAdded = isAdded || feature.isAdded
                 }
 
-                for (subModule in module.submodules) {
-                    for (feature in subModule.features) {
-                        feature.isAdded = !feature.isAdded
-                        isAdded = isAdded || feature.isAdded
-                    }
-                }
+//                for (subModule in module.submodules) {
+//                    for (feature in subModule.features) {
+//                        feature.isAdded = !feature.isAdded
+//                        isAdded = isAdded || feature.isAdded
+//                    }
+//                }
 
                 module.isAdded = !module.isAdded
                 module.isAdded = module.isAdded || isAdded
@@ -210,11 +210,11 @@ class ModuleGroupAdapter internal constructor(
                     if (feature.isAdded) feature.isAdded = false
                 }
 
-                for (subModule in module.submodules) {
-                    for (feature in subModule.features) {
-                        if (feature.isAdded) feature.isAdded = false
-                    }
-                }
+//                for (subModule in module.submodules) {
+//                    for (feature in subModule.features) {
+//                        if (feature.isAdded) feature.isAdded = false
+//                    }
+//                }
             }
             notifyItemChanged(position)
             callback(dataList[position])

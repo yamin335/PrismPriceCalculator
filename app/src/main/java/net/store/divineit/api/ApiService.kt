@@ -1,9 +1,6 @@
 package net.store.divineit.api
 
-import net.store.divineit.models.AllProductsResponse
-import net.store.divineit.models.LoginResponse
-import net.store.divineit.models.SignUpResponse
-import net.store.divineit.models.SummaryResponse
+import net.store.divineit.models.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -23,4 +20,7 @@ interface ApiService {
 
     @POST(ApiEndPoint.QUOTATION_SUBMIT)
     suspend fun submitQuotation(@Body jsonString: String): Response<SummaryResponse>
+
+    @POST(ApiEndPoint.PRODUCT_DETAILS)
+    suspend fun productDetails(@Body jsonString: String): Response<ServiceModuleResponse>
 }

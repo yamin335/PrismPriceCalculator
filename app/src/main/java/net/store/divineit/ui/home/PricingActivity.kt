@@ -13,6 +13,9 @@ import net.store.divineit.ui.base.BaseActivity
 
 @AndroidEntryPoint
 class PricingActivity : BaseActivity<PricingActivityBinding, PricingViewModel>() {
+    companion object {
+        var productId: String = ""
+    }
     override val bindingVariable: Int
         get() = BR.viewModel
     override val layoutId: Int
@@ -25,6 +28,7 @@ class PricingActivity : BaseActivity<PricingActivityBinding, PricingViewModel>()
         setUpToolbar()
 
         binding.btnCustomize.setOnClickListener {
+            MainActivity.productId = productId
             startActivity(Intent(this@PricingActivity, MainActivity::class.java))
             overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
         }

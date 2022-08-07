@@ -49,6 +49,47 @@ class MainActivityViewModel @Inject constructor(
         MutableLiveData<SummaryResponse>()
     }
 
+    val baseModuleListTemp: MutableLiveData<List<BaseServiceModule>> by lazy {
+        MutableLiveData<List<BaseServiceModule>>()
+    }
+
+    var baseModuleList: ArrayList<BaseServiceModule> = ArrayList()
+
+    fun productDetails(productId: String) {
+        if (checkNetworkStatus(true)) {
+            val handler = CoroutineExceptionHandler { _, exception ->
+                exception.printStackTrace()
+                apiCallStatus.postValue(ApiCallStatus.ERROR)
+                toastError.postValue(application.getString(R.string.commonErrorMessage))
+            }
+
+            apiCallStatus.postValue(ApiCallStatus.LOADING)
+            viewModelScope.launch(handler) {
+                when (val apiResponse = ApiResponse.create(homeRepository.productDetails(productId))) {
+                    is ApiSuccessResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        when(apiResponse.body.code) {
+                            2000001 -> {
+                                baseModuleListTemp.postValue(apiResponse.body.data?.Modules)
+                            }
+                            else -> {
+                                toastError.postValue("Failed! Please try again.")
+                            }
+                        }
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        toastError.postValue("Failed! Please try again.")
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        toastError.postValue("Failed! Please try again.")
+                    }
+                }
+            }
+        }
+    }
+
     private fun submitQuotation(summaryStoreBody: SummaryStoreModel) {
         if (checkNetworkStatus(true)) {
             val handler = CoroutineExceptionHandler { _, exception ->
