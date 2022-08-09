@@ -8,7 +8,7 @@ data class BaseServiceModule (
     val code: String?,
     val name: String?,
     val moduleGroups: List<ModuleGroup>,
-    val multipliers: List<MultiplierClass>
+    var multipliers: List<MultiplierClass>
 )
 
 data class ModuleGroup (
@@ -18,7 +18,6 @@ data class ModuleGroup (
     val ModuleEndIndex: Int?,
     val modules: List<ServiceModule>,
     val dependencies: List<Any?>,
-    val multipliers: List<MultiplierClass>,
     val showMultiplier: String?,
     val description: String?,
     var isExpanded: Boolean = false

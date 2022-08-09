@@ -622,6 +622,7 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="24dp"
                 android:backgroundTint="@color/blue2"
+                android:enabled="false"
                 android:text="Submit"
                 android:textAllCaps="false"
                 android:windowSoftInputMode="adjustResize"

@@ -22,7 +22,8 @@ class ModuleListAdapter internal constructor(
 ) : RecyclerView.Adapter<ModuleListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding: ModuleListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_module, parent, false)
+        val binding: ModuleListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context),
+            R.layout.list_item_module, parent, false)
         return ViewHolder(binding)
     }
 
@@ -113,6 +114,33 @@ class ModuleListAdapter internal constructor(
 //            }
             //subModuleListAdapter.submitList(item.submodules)
 
+            if (item.isAdded) {
+                binding.btnAdd.text = "Remove"
+                binding.btnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.green1))
+            } else {
+                binding.btnAdd.text = "Add"
+                binding.btnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.blue1))
+            }
+
+            binding.btnAdd.setOnClickListener {
+                dataList[position].isAdded = !dataList[position].isAdded
+
+                if (!dataList[position].isAdded) {
+                    for (feature in dataList[position].features) {
+                        feature.isAdded = false
+                    }
+
+//                    for (subModule in dataList[position].submodules) {
+//                        for (feature in subModule.features) {
+//                            feature.isAdded = false
+//                        }
+//                    }
+                }
+                moduleChangeCallback()
+            }
+
+            if (dataList[position].features.isNullOrEmpty()) return
+
             val featureListAdapter = FeatureListAdapter(dataList[position].features) {
                 if (!dataList[position].isAdded) {
                     for (feature in dataList[position].features) {
@@ -142,31 +170,6 @@ class ModuleListAdapter internal constructor(
                 adapter = featureListAdapter
             }
             //featureListAdapter.submitList(item.features)
-
-            if (item.isAdded) {
-                binding.btnAdd.text = "Remove"
-                binding.btnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.green1))
-            } else {
-                binding.btnAdd.text = "Add"
-                binding.btnAdd.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.blue1))
-            }
-
-            binding.btnAdd.setOnClickListener {
-                dataList[position].isAdded = !dataList[position].isAdded
-
-                if (!dataList[position].isAdded) {
-                    for (feature in dataList[position].features) {
-                        feature.isAdded = false
-                    }
-
-//                    for (subModule in dataList[position].submodules) {
-//                        for (feature in subModule.features) {
-//                            feature.isAdded = false
-//                        }
-//                    }
-                }
-                moduleChangeCallback()
-            }
         }
     }
 }

@@ -7,11 +7,12 @@ data class SummaryStoreModel (
     val header: String?,
     val productid: String?,
     val totalamount: Int?,
-    val softwareLicense: SummarySoftwareLicense?,
-    val implementation: SummaryService?,
-    val customization: SummaryService?,
-    val consultancy: SummaryService?,
-    val maintainance: SummaryService?
+    val Software_License: SummarySoftwareLicense?,
+    val Implementation: SummaryService?,
+    val Customization: SummaryService?,
+    val Consultancy: SummaryService?,
+    val Maintainance: SummaryService?,
+    val company: String
 )
 
 data class SummarySoftwareLicense (
@@ -26,15 +27,17 @@ data class SoftwareLicenseModule (
     val name: String?,
     val totalamount: Int?,
     val code: String?,
+    val licensingparameters: ArrayList<LicensingParameter>,
     val features: ArrayList<SummaryModuleFeature>
 )
 
 data class SummaryModuleFeature (
     val code: String?,
+    val multiplier: String?,
     val multipliercode: String?,
-    val price: Int?,
-    val prices: List<String>,
-    val type: String?
+    val price: List<String>,
+    val type: String?,
+    val defaultprice: Int?
 )
 
 data class SummaryService (
@@ -46,7 +49,13 @@ data class SummaryService (
 data class SummaryServiceModule (
     val name: String?,
     val details: String?,
-    val detailsValue: Int?,
-    val detailsMultiplier: Int?,
+    val details_value: Int?,
+    val details_multiplier: Int?,
     val totalamount: Int?
+)
+
+data class LicensingParameter (
+    val name: String?,
+    val value: String?,
+    val slabid: Int?
 )

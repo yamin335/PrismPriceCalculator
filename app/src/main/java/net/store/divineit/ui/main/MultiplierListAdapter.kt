@@ -70,29 +70,38 @@ class MultiplierListAdapter internal constructor(
             } else {
                 binding.linearSlider.visibility = View.GONE
                 for ((index, slab) in item.slabs.withIndex()) {
-                    var prefix = ""
-                    if (item.slabTexts.size > index) {
-                        prefix = item.slabTexts[index]
-                    }
-
-                    val increment = item.slabConfig?.increment ?: 0
-                    var startItem = increment
-
-                    if (index > 0) {
-                        val previousItem = item.slabs[index - 1].toDouble().toInt()
-                        startItem = previousItem + increment
-                    }
-
-                    try {
-                        val slabPrice = slab.toDouble().toInt()
-                        val slabText = if (prefix.isBlank()) {
-                            if (startItem == slabPrice) "$slabPrice" else "$startItem-${slabPrice}"
-                        } else {
-                            if (startItem == slabPrice) "$prefix(${slabPrice})" else "$prefix($startItem-${slabPrice})"
+                    val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
+                    if (isNumber) {
+                        var prefix = ""
+                        if (item.slabTexts.size > index) {
+                            prefix = item.slabTexts[index]
                         }
-                        binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+
+                        val increment = item.slabConfig?.increment ?: 0
+                        var startItem = increment
+
+                        if (index > 0) {
+                            try {
+                                val previousItem = item.slabs[index - 1].toDouble().toInt()
+                                startItem = previousItem + increment
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+
+                        try {
+                            val slabPrice = slab.toDouble().toInt()
+                            val slabText = if (prefix.isBlank()) {
+                                if (startItem == slabPrice) "$slabPrice" else "$startItem-${slabPrice}"
+                            } else {
+                                if (startItem == slabPrice) "$prefix(${slabPrice})" else "$prefix($startItem-${slabPrice})"
+                            }
+                            binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
+                        }
+                    } else {
                         binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
                     }
                 }

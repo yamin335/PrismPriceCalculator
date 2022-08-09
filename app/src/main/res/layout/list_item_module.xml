@@ -15,7 +15,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/recyclerSubModule"
+            app:layout_constraintBottom_toTopOf="@id/recyclerFeatures"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -103,6 +103,7 @@
                 android:text="Add"
                 android:textAllCaps="false"
                 android:textSize="12sp"
+                android:visibility="gone"
                 app:cornerRadius="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -117,6 +118,7 @@
                 android:layout_marginEnd="8dp"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btnAdd"
                 app:layout_constraintTop_toTopOf="parent"
@@ -138,18 +140,6 @@
                     android:textSize="11sp" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerSubModule"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@id/recyclerFeatures"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:itemCount="1"
-            tools:listitem="@layout/list_item_sub_module" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerFeatures"

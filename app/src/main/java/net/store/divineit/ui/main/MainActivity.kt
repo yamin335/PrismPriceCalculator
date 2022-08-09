@@ -86,8 +86,8 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             baseModuleList?.let {
                 viewModel.baseModuleList = baseModuleList as ArrayList<BaseServiceModule>
                 baseServiceAdapter = BaseServiceModuleListAdapter(viewModel.baseModuleList) { baseModule, position ->
-                    loadHeaderMultipliers(baseModule)
                     selectedBaseModulePosition = position
+                    loadHeaderMultipliers(viewModel.baseModuleList[selectedBaseModulePosition])
                     binding.drawerLayout.closeDrawer(GravityCompat.END)
                     CoroutineScope(Dispatchers.Main.immediate).launch {
                         delay(250)
@@ -208,6 +208,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         var summaryModuleTotalPrice = 0
 
         for (moduleGroup in baseModule.moduleGroups) {
+
+            if (moduleGroup.modules.isNullOrEmpty()) continue
+
             for (module in moduleGroup.modules) {
                 if (module.isAdded) {
                     var slabPrice = 0
@@ -226,10 +229,12 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
                     price += slabPrice
                     summaryModuleTotalPrice += slabPrice
-                    summaryModuleFeatureList.add(SummaryModuleFeature(code = module.code,
-                        multipliercode = "", price = slabPrice, prices = module.price, type = "module"))
+                    summaryModuleFeatureList.add(SummaryModuleFeature(code = module.code, multiplier = module.multiplier,
+                        multipliercode = "", price = module.price, type = "module", defaultprice = module.defaultprice.toInt()))
                     isAdded = true
                 }
+
+                if (module.features.isNullOrEmpty()) continue
 
                 for (feature in module.features) {
                     if (feature.isAdded) {
@@ -249,18 +254,62 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
                         price += slabPrice
                         summaryModuleTotalPrice += slabPrice
-                        summaryModuleFeatureList.add(SummaryModuleFeature(code = feature.code,
-                            multipliercode = "", price = slabPrice, prices = feature.price, type = "feature"))
+                        summaryModuleFeatureList.add(SummaryModuleFeature(code = feature.code, multiplier = feature.multiplier,
+                            multipliercode = "", price = feature.price, type = "feature", defaultprice = feature.defaultprice.toInt()))
                         isAdded = true
                     }
                 }
             }
         }
 
+        val licensingParameters: ArrayList<LicensingParameter> = ArrayList()
+
+        for (multiplier in baseModule.multipliers) {
+            val slabIndex = multiplier.slabIndex
+            if (multiplier.slabs.isNullOrEmpty()) continue
+            val slab = multiplier.slabs[slabIndex]
+            val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
+            val param: LicensingParameter = if (isNumber) {
+                var prefix = ""
+                if (multiplier.slabTexts.size > slabIndex) {
+                    prefix = multiplier.slabTexts[slabIndex]
+                }
+
+                val increment = multiplier.slabConfig?.increment ?: 0
+                var startItem = increment
+
+                if (slabIndex > 0) {
+                    try {
+                        val previousItem = multiplier.slabs[slabIndex - 1].toDouble().toInt()
+                        startItem = previousItem + increment
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                try {
+                    val slabPrice = slab.toDouble().toInt()
+                    val slabText = if (prefix.isBlank()) {
+                        if (startItem == slabPrice) "$slabPrice" else "$startItem-${slabPrice}"
+                    } else {
+                        if (startItem == slabPrice) "$prefix(${slabPrice})" else "$prefix($startItem-${slabPrice})"
+                    }
+                    LicensingParameter(multiplier.code, slabText, 0)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    LicensingParameter(multiplier.code, slab, 0)
+                }
+            } else {
+                LicensingParameter(multiplier.code, slab, 0)
+            }
+
+            licensingParameters.add(param)
+        }
+
         if (isAdded) {
             viewModel.summaryMap[baseModule.code ?: ""] = ModuleGroupSummary(baseModule.code ?: "", baseModule.name ?: "", price)
             viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SoftwareLicenseModule(name = baseModule. name,
-                totalamount = summaryModuleTotalPrice, code = baseModule.code, features = summaryModuleFeatureList)
+                totalamount = summaryModuleTotalPrice, code = baseModule.code, licensingparameters = licensingParameters, features = summaryModuleFeatureList)
         } else {
             viewModel.summaryMap.remove(key = baseModule.code)
             viewModel.softwareLicenseModuleMap.remove(key = baseModule.code)
@@ -277,15 +326,17 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         calculateSummaryCost(moduleCost)
         bindSummaryCostDataToUI()
         moduleSummaryAdapter.submitList(moduleSummaryList)
+
+        binding.appBarMain.contentMain.summarySheet.btnSubmit.isEnabled = viewModel.softwareLicenseModuleMap.isNotEmpty()
     }
 
     private fun loadHeaderMultipliers(baseModule: BaseServiceModule) {
-        if (baseModule.moduleGroups.isEmpty()) return
-
-        binding.appBarMain.contentMain.linearHeader.visibility = if (baseModule.moduleGroups[0].multipliers.isEmpty()) View.GONE else View.VISIBLE
-        multiplierListAdapter.submitList(baseModule.moduleGroups[0].multipliers.filter {
+        val validMultipliers = baseModule.multipliers.filter {
             return@filter (it.label?.isNotBlank() == true) && it.slabConfig?.hideInApp != true
-        })
+        }
+        baseModule.multipliers = validMultipliers
+        binding.appBarMain.contentMain.linearHeader.visibility = if (baseModule.multipliers.isEmpty()) View.GONE else View.VISIBLE
+        multiplierListAdapter.submitList(baseModule.multipliers)
     }
 
     private fun calculateSummaryCost(moduleCost: Int) {
@@ -369,12 +420,19 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     }
 
     private fun calculateModuleAndFeaturePrice(pair: Pair<Int, String>) {
+        if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.isNullOrEmpty()) return
+
         for (groupIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
+
+            if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.isNullOrEmpty()) return
+
             for (moduleIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.indices) {
                 val moduleMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].multiplier
                 if (moduleMultiplierCode is String && moduleMultiplierCode == pair.second) {
                     calculateModulePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex], pair.first)
                 }
+
+                if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.isNullOrEmpty()) return
 
                 for (featureIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.indices) {
                     val featureMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].multiplier

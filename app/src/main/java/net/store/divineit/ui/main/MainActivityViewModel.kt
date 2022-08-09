@@ -11,7 +11,6 @@ import net.store.divineit.R
 import net.store.divineit.api.ApiCallStatus
 import net.store.divineit.models.*
 import net.store.divineit.repo.HomeRepository
-import net.store.divineit.repo.LoginRepository
 import net.store.divineit.ui.base.BaseViewModel
 import net.store.divineit.utils.ApiEmptyResponse
 import net.store.divineit.utils.ApiErrorResponse
@@ -134,7 +133,7 @@ class MainActivityViewModel @Inject constructor(
                 SummaryServiceModule(
                     name = "Annual Maintenance Cost", 
                     details = null,
-                    detailsValue = null, detailsMultiplier = null,
+                    details_value = null, details_multiplier = null,
                     totalamount = costAnnualMaintenance
                 )
             )
@@ -147,8 +146,8 @@ class MainActivityViewModel @Inject constructor(
                 SummaryServiceModule(
                     name = "Consultancy", 
                     details = " man-days x ৳",
-                    detailsValue = 0, 
-                    detailsMultiplier = 20000,
+                    details_value = 0, 
+                    details_multiplier = 20000,
                     totalamount = costConsultancy
                 )
             )
@@ -161,15 +160,15 @@ class MainActivityViewModel @Inject constructor(
                 SummaryServiceModule(
                     name = "Software Customization", 
                     details = "man-days x ৳",
-                    detailsValue = 0, 
-                    detailsMultiplier = 16000,
+                    details_value = 0, 
+                    details_multiplier = 16000,
                     totalamount = costSoftwareCustomization
                 ),
                 SummaryServiceModule(
                     name = "Customized Report", 
                     details = "man-days x ৳",
-                    detailsValue = 0, 
-                    detailsMultiplier = 16000,
+                    details_value = 0, 
+                    details_multiplier = 16000,
                     totalamount = costCustomizedReport
                 )
             )
@@ -182,43 +181,43 @@ class MainActivityViewModel @Inject constructor(
                 SummaryServiceModule(
                     name = "Requirement Analysis",
                     details = "man-days x ৳",
-                    detailsValue = 0,
-                    detailsMultiplier = 10000,
+                    details_value = 0,
+                    details_multiplier = 10000,
                     totalamount = 0
                 ),
                 SummaryServiceModule(
                     name = "Deployment",
                     details = "(onetime) x ৳",
-                    detailsValue = 1,
-                    detailsMultiplier = 10000,
+                    details_value = 1,
+                    details_multiplier = 10000,
                     totalamount = costImplementation
                 ),
                 SummaryServiceModule(
                     name = "Configuration",
                     details = "man-days x ৳",
-                    detailsValue = 0,
-                    detailsMultiplier = 10000,
+                    details_value = 0,
+                    details_multiplier = 10000,
                     totalamount = 0
                 ),
                 SummaryServiceModule(
                     name = "Onsite Adoption Support",
                     details = "man-days x ৳",
-                    detailsValue = 0,
-                    detailsMultiplier = 6000,
+                    details_value = 0,
+                    details_multiplier = 6000,
                     totalamount = 0
                 ),
                 SummaryServiceModule(
                     name = "Training",
                     details = "sessions x ৳",
-                    detailsValue = 0,
-                    detailsMultiplier = 6000,
+                    details_value = 0,
+                    details_multiplier = 6000,
                     totalamount = 0
                 ),
                 SummaryServiceModule(
                     name = "Project Management",
                     details = "man-days x ৳",
-                    detailsValue = 0,
-                    detailsMultiplier = 12000,
+                    details_value = 0,
+                    details_multiplier = 12000,
                     totalamount = 0
                 )
             )
@@ -241,12 +240,13 @@ class MainActivityViewModel @Inject constructor(
         header = "Software License", totalamount = totalAmount,
         modules = softwareLicenseModuleList)
 
-        val summaryStoreBody = SummaryStoreModel(salesmanid = preferencesHelper.userAccount?.salesmanid,
-        customerid = preferencesHelper.userAccount?.id, details = false,
-        header = "Summery", productid = "prismerp",
-        totalamount = totalAmount, softwareLicense = summarySoftwareLicense,
-        implementation = implementation, customization = customization,
-        consultancy = consultancy, maintainance = maintenance)
+        val summaryStoreBody = SummaryStoreModel(
+            salesmanid = preferencesHelper.userAccount?.salesmanid,
+            customerid = preferencesHelper.userAccount?.id, details = false,
+            header = "Summery", productid = "prismerp",
+            totalamount = totalAmount, Software_License = summarySoftwareLicense,
+            Implementation = implementation, Customization = customization,
+            Consultancy = consultancy, Maintainance = maintenance, company = "RTC Hubs")
         submitQuotation(summaryStoreBody = summaryStoreBody)
     }
 }

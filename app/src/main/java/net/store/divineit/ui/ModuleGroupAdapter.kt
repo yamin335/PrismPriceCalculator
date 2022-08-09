@@ -120,31 +120,31 @@ class ModuleGroupAdapter internal constructor(
                 binding.recyclerModule.visibility = View.GONE
             }
 
-            val validMultipliersList = ArrayList<MultiplierClass>()
-            val showMultiplier = dataList[position].showMultiplier ?: ""
-            val validMultiplierClasses = showMultiplier.split(",").toList()
-
-            for (multiplier in dataList[position].multipliers) {
-                if (validMultiplierClasses.contains(multiplier.code)) validMultipliersList.add(multiplier)
-            }
-
-            if (validMultipliersList.isNotEmpty()) {
-                val moduleListAdapter = MultiplierListAdapter(validMultipliersList) {
-
-                }
-                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-                innerLLM.initialPrefetchItemCount = 3
-
-                binding.recyclerMultipliers.apply {
-                    visibility = View.VISIBLE
-                    isNestedScrollingEnabled = false
-                    setHasFixedSize(true)
-                    layoutManager = innerLLM
-                    adapter = moduleListAdapter
-                }
-            } else {
-                binding.recyclerMultipliers.visibility = View.GONE
-            }
+//            val validMultipliersList = ArrayList<MultiplierClass>()
+//            val showMultiplier = dataList[position].showMultiplier ?: ""
+//            val validMultiplierClasses = showMultiplier.split(",").toList()
+//
+//            for (multiplier in dataList[position].multipliers) {
+//                if (validMultiplierClasses.contains(multiplier.code)) validMultipliersList.add(multiplier)
+//            }
+//
+//            if (validMultipliersList.isNotEmpty()) {
+//                val moduleListAdapter = MultiplierListAdapter(validMultipliersList) {
+//
+//                }
+//                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+//                innerLLM.initialPrefetchItemCount = 3
+//
+//                binding.recyclerMultipliers.apply {
+//                    visibility = View.VISIBLE
+//                    isNestedScrollingEnabled = false
+//                    setHasFixedSize(true)
+//                    layoutManager = innerLLM
+//                    adapter = moduleListAdapter
+//                }
+//            } else {
+//                binding.recyclerMultipliers.visibility = View.GONE
+//            }
 
             binding.btnAddEverything.setOnClickListener {
                 addAll(position)
