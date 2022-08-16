@@ -14,7 +14,8 @@ import net.store.divineit.databinding.MultiplierListItemBinding
 import net.store.divineit.models.MultiplierClass
 
 class MultiplierListAdapter internal constructor(
-    private val callback: (Int, String, Int) -> Unit
+    private val callback: (Int, String, Int) -> Unit,
+    private val sliderCallback: (String, Int) -> Unit
 ) : RecyclerView.Adapter<MultiplierListAdapter.ViewHolder>() {
 
     private var dataList: ArrayList<MultiplierClass> = ArrayList()
@@ -47,26 +48,30 @@ class MultiplierListAdapter internal constructor(
 
             if (item.slabConfig?.inputType == "slider") {
                 binding.linearSlider.visibility = View.VISIBLE
-                if (item.slabs.isEmpty()) {
-                    binding.linearSlider.visibility = View.GONE
-                    return
-                }
+//                if (item.slabs.isEmpty()) {
+//                    binding.linearSlider.visibility = View.GONE
+//                    return
+//                }
 
-                var sliderMaxRange = 10.0
+                var sliderMaxRange = 50.0
 
-                try {
-                    sliderMaxRange = item.slabs[0].toDouble()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+//                try {
+//                    sliderMaxRange = item.slabs[0].toDouble()
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
 
                 binding.slider.valueTo = sliderMaxRange.toFloat()
 
                 binding.maxText.text = "MAX ($sliderMaxRange)"
 
-                val sliderStepSize = item.slabConfig.increment ?: 1
+                val sliderStepSize = 1 //item.slabConfig.increment ?: 1
 
                 binding.slider.stepSize = sliderStepSize.toFloat()
+
+                binding.slider.addOnChangeListener { slider, value, fromUser -> /* `value` is the argument you need */
+                    sliderCallback(item.code ?: "", value.toInt())
+                }
             } else {
                 binding.linearSlider.visibility = View.GONE
                 for ((index, slab) in item.slabs.withIndex()) {

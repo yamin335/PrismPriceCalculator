@@ -11,5 +11,9 @@ object AppConstants {
     const val percentProjectManagement = 10
     const val percentConsultancy = 10
     const val percentMaintenance = 20
-
+    const val costAdditionalUsers = 150000
+    const val unitPriceSoftwareCustomization = 16000
+    const val unitPriceCustomizedReports = 16000
+    const val perUserCost = 50000
+    const val additionalUsers = 5
 }

@@ -26,6 +26,8 @@ import net.store.divineit.ui.base.BaseActivity
 import net.store.divineit.utils.AppConstants
 import net.store.divineit.ui.login.LoginActivity
 import java.io.*
+import kotlin.math.abs
+import kotlin.math.ceil
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() {
@@ -70,12 +72,24 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         moduleSummaryAdapter = ModuleGroupSummaryListAdapter()
         binding.appBarMain.contentMain.summarySheet.recyclerSummary.adapter = moduleSummaryAdapter
 
-        multiplierListAdapter = MultiplierListAdapter { index, multiplierCode, position ->
+        multiplierListAdapter = MultiplierListAdapter( callback = { index, multiplierCode, position ->
             viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabIndex = index
             calculateModuleAndFeaturePrice(Pair(index, multiplierCode))
             calculateSummary()
             moduleGroupAdapter.notifyDataSetChanged()
-        }
+        }, sliderCallback = { code, value ->
+            when (code) {
+                "custom" -> {
+                    viewModel.costSoftwareCustomization = value * AppConstants.unitPriceSoftwareCustomization
+                    calculateSummary()
+                }
+
+                "report" -> {
+                    viewModel.costCustomizedReport = value * AppConstants.unitPriceCustomizedReports
+                    calculateSummary()
+                }
+            }
+        })
 
         binding.appBarMain.contentMain.multipliers.apply {
             setHasFixedSize(true)
@@ -215,9 +229,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 if (module.isAdded) {
                     var slabPrice = 0
                     if (module.defaultprice == 0.0) {
-                        if (module.price.isEmpty()) return
+                        if (module.price.isEmpty()) continue
                         val modulePrice = module.price[0]
-                        if (modulePrice.isBlank()) return
+                        if (modulePrice.isBlank()) continue
                         try {
                             slabPrice = modulePrice.toDouble().toInt()
                         } catch (e: Exception) {
@@ -229,8 +243,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
                     price += slabPrice
                     summaryModuleTotalPrice += slabPrice
-                    summaryModuleFeatureList.add(SummaryModuleFeature(code = module.code, multiplier = module.multiplier,
-                        multipliercode = "", price = module.price, type = "module", defaultprice = module.defaultprice.toInt()))
+                    summaryModuleFeatureList.add(SummaryModuleFeature(name = module.name, code = module.code, multiplier = module.multiplier,
+                        multipliercode = "", price = module.price, type = "module", defaultprice = module.defaultprice.toInt(),
+                        totalamount = module.defaultprice.toInt()))
                     isAdded = true
                 }
 
@@ -240,9 +255,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                     if (feature.isAdded) {
                         var slabPrice = 0
                         if (feature.defaultprice == 0.0) {
-                            if (feature.price.isEmpty()) return
+                            if (feature.price.isEmpty()) continue
                             val featurePrice = feature.price[0]
-                            if (featurePrice.isBlank()) return
+                            if (featurePrice.isBlank()) continue
                             try {
                                 slabPrice = featurePrice.toDouble().toInt()
                             } catch (e: Exception) {
@@ -254,8 +269,8 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
                         price += slabPrice
                         summaryModuleTotalPrice += slabPrice
-                        summaryModuleFeatureList.add(SummaryModuleFeature(code = feature.code, multiplier = feature.multiplier,
-                            multipliercode = "", price = feature.price, type = "feature", defaultprice = feature.defaultprice.toInt()))
+                        summaryModuleFeatureList.add(SummaryModuleFeature(name = feature.name, code = feature.code, multiplier = feature.multiplier,
+                            multipliercode = "", price = feature.price, type = "feature", defaultprice = feature.defaultprice.toInt(), totalamount = feature.defaultprice.toInt()))
                         isAdded = true
                     }
                 }
@@ -340,6 +355,10 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     }
 
     private fun calculateSummaryCost(moduleCost: Int) {
+        val totalUsers = ceil((moduleCost.toDouble() / AppConstants.perUserCost)).toInt()
+        viewModel.additionalUsers = if (totalUsers <= AppConstants.additionalUsers) AppConstants.additionalUsers - totalUsers else 0 //abs((AppConstants.additionalUsers - totalUsers))
+        viewModel.usersIncluded = totalUsers //abs((AppConstants.additionalUsers - totalUsers)) //if (totalUsers >= AppConstants.additionalUsers) totalUsers - AppConstants.additionalUsers else totalUsers
+        viewModel.costAdditionalUsers = (AppConstants.costAdditionalUsers / AppConstants.additionalUsers) * viewModel.additionalUsers
         viewModel.costSoftwareLicense = moduleCost + viewModel.costAdditionalUsers
 
         viewModel.costRequirementAnalysis = (viewModel.costSoftwareLicense * AppConstants.percentRequirementAnalysis) / 100
@@ -370,8 +389,18 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         val costSoftwareLicenseText = if (viewModel.costSoftwareLicense > 0) "৳${viewModel.costSoftwareLicense}" else "-"
         binding.appBarMain.contentMain.summarySheet.costSoftwareLicense.text = costSoftwareLicenseText
 
-        val costAdditionalUsersText = if (viewModel.costAdditionalUsers > 0) "৳${viewModel.costAdditionalUsers}" else "-"
-        binding.appBarMain.contentMain.summarySheet.costAdditionalUsers.text = costAdditionalUsersText
+        val usersIncludedText = "${viewModel.usersIncluded} Users Included"
+        binding.appBarMain.contentMain.summarySheet.usersIncluded.text = usersIncludedText
+
+        if (viewModel.additionalUsers > 0) {
+            val additionalUsersText = "${viewModel.additionalUsers} Additional User"
+            binding.appBarMain.contentMain.summarySheet.additionalUsers.text = additionalUsersText
+            val costAdditionalUsersText = if (viewModel.costAdditionalUsers > 0) "৳${viewModel.costAdditionalUsers}" else "-"
+            binding.appBarMain.contentMain.summarySheet.costAdditionalUsers.text = costAdditionalUsersText
+            binding.appBarMain.contentMain.summarySheet.linearAdditionalUsers.visibility = View.VISIBLE
+        } else {
+            binding.appBarMain.contentMain.summarySheet.linearAdditionalUsers.visibility = View.GONE
+        }
 
         val costImplementationText = if (viewModel.costImplementation > 0) "৳${viewModel.costImplementation}" else "-"
         binding.appBarMain.contentMain.summarySheet.costImplementation.text = costImplementationText

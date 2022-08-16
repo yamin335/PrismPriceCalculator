@@ -32,12 +32,14 @@ data class SoftwareLicenseModule (
 )
 
 data class SummaryModuleFeature (
+    val name: String?,
     val code: String?,
     val multiplier: String?,
     val multipliercode: String?,
     val price: List<String>,
     val type: String?,
-    val defaultprice: Int?
+    val defaultprice: Int?,
+    val totalamount: Int?
 )
 
 data class SummaryService (

@@ -12,10 +12,7 @@ import net.store.divineit.api.ApiCallStatus
 import net.store.divineit.models.*
 import net.store.divineit.repo.HomeRepository
 import net.store.divineit.ui.base.BaseViewModel
-import net.store.divineit.utils.ApiEmptyResponse
-import net.store.divineit.utils.ApiErrorResponse
-import net.store.divineit.utils.ApiResponse
-import net.store.divineit.utils.ApiSuccessResponse
+import net.store.divineit.utils.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,7 +21,9 @@ class MainActivityViewModel @Inject constructor(
     private val homeRepository: HomeRepository
 ) : BaseViewModel(application) {
     var costSoftwareLicense = 0
-    var costAdditionalUsers = 150000
+    var costAdditionalUsers = 0
+    var additionalUsers = AppConstants.additionalUsers
+    var usersIncluded = 0
     var costImplementation = 0
     var costRequirementAnalysis = 0
     var costDeployment = 0
