@@ -130,6 +130,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                     layoutManager = innerLLM
                     adapter = moduleGroupAdapter
                 }
+                calculateSummary()
             }
         }
 
@@ -285,49 +286,75 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             val slab = multiplier.slabs[slabIndex]
             val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
             val param: LicensingParameter = if (isNumber) {
-                var prefix = ""
-                if (multiplier.slabTexts.size > slabIndex) {
-                    prefix = multiplier.slabTexts[slabIndex]
-                }
+                if (multiplier.slabConfig?.showRange == true) {
+                    var prefix = ""
+                    if (multiplier.slabTexts.size > slabIndex) {
+                        prefix = multiplier.slabTexts[slabIndex]
+                    }
 
-                val increment = multiplier.slabConfig?.increment ?: 0
-                var startItem = increment
+                    val increment = 1
+                    var startItem = increment
 
-                if (slabIndex > 0) {
+                    if (slabIndex > 0) {
+                        try {
+                            val previousItem = multiplier.slabs[slabIndex - 1].toDouble().toInt()
+                            startItem = previousItem + increment
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+
                     try {
-                        val previousItem = multiplier.slabs[slabIndex - 1].toDouble().toInt()
-                        startItem = previousItem + increment
+                        val slabPrice = slab.toDouble().toInt()
+                        val slabText = if (prefix.isBlank()) {
+                            "$startItem-${slabPrice}"
+                        } else {
+                            "$prefix($startItem-${slabPrice})"
+                        }
+                        LicensingParameter(multiplier.code, slabText, 0)
                     } catch (e: Exception) {
                         e.printStackTrace()
+                        LicensingParameter(multiplier.code, slab, 0)
                     }
-                }
+                } else {
+                    var prefix = ""
+                    if (multiplier.slabTexts.size > slabIndex) {
+                        prefix = multiplier.slabTexts[slabIndex]
+                    }
 
-                try {
-                    val slabPrice = slab.toDouble().toInt()
-                    val slabText = if (prefix.isBlank()) {
-                        if (startItem == slabPrice) "$slabPrice" else "$startItem-${slabPrice}"
-                    } else {
-                        if (startItem == slabPrice) "$prefix(${slabPrice})" else "$prefix($startItem-${slabPrice})"
+                    try {
+                        val slabPrice = slab.toDouble().toInt()
+                        val slabText = if (prefix.isBlank()) {
+                            "$slabPrice"
+                        } else {
+                            "$prefix(${slabPrice})"
+                        }
+                        LicensingParameter(multiplier.code, slabText, 0)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        LicensingParameter(multiplier.code, slab, 0)
                     }
-                    LicensingParameter(multiplier.code, slabText, 0)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    LicensingParameter(multiplier.code, slab, 0)
                 }
             } else {
                 LicensingParameter(multiplier.code, slab, 0)
             }
-
             licensingParameters.add(param)
         }
 
-        if (isAdded) {
-            viewModel.summaryMap[baseModule.code ?: ""] = ModuleGroupSummary(baseModule.code ?: "", baseModule.name ?: "", price)
+        if (selectedBaseModulePosition == 0) {
             viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SoftwareLicenseModule(name = baseModule. name,
-                totalamount = summaryModuleTotalPrice, code = baseModule.code, licensingparameters = licensingParameters, features = summaryModuleFeatureList)
+                totalamount = summaryModuleTotalPrice, code = baseModule.code,
+                licensingparameters = licensingParameters, features = summaryModuleFeatureList)
         } else {
-            viewModel.summaryMap.remove(key = baseModule.code)
-            viewModel.softwareLicenseModuleMap.remove(key = baseModule.code)
+            if (isAdded) {
+                viewModel.summaryMap[baseModule.code ?: ""] = ModuleGroupSummary(baseModule.code ?: "", baseModule.name ?: "", price)
+                viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SoftwareLicenseModule(name = baseModule. name,
+                    totalamount = summaryModuleTotalPrice, code = baseModule.code,
+                    licensingparameters = licensingParameters, features = summaryModuleFeatureList)
+            } else {
+                viewModel.summaryMap.remove(key = baseModule.code)
+                viewModel.softwareLicenseModuleMap.remove(key = baseModule.code)
+            }
         }
 
         var moduleCost = 0

@@ -159,14 +159,14 @@ class MainActivityViewModel @Inject constructor(
                 SummaryServiceModule(
                     name = "Software Customization", 
                     details = "man-days x ৳",
-                    details_value = 0, 
+                    details_value = costSoftwareCustomization / AppConstants.unitPriceSoftwareCustomization,
                     details_multiplier = 16000,
                     totalamount = costSoftwareCustomization
                 ),
                 SummaryServiceModule(
                     name = "Customized Report", 
                     details = "man-days x ৳",
-                    details_value = 0, 
+                    details_value = costCustomizedReport / AppConstants.unitPriceCustomizedReports,
                     details_multiplier = 16000,
                     totalamount = costCustomizedReport
                 )
@@ -182,7 +182,7 @@ class MainActivityViewModel @Inject constructor(
                     details = "man-days x ৳",
                     details_value = 0,
                     details_multiplier = 10000,
-                    totalamount = 0
+                    totalamount = costRequirementAnalysis
                 ),
                 SummaryServiceModule(
                     name = "Deployment",
@@ -196,28 +196,28 @@ class MainActivityViewModel @Inject constructor(
                     details = "man-days x ৳",
                     details_value = 0,
                     details_multiplier = 10000,
-                    totalamount = 0
+                    totalamount = costConfiguration
                 ),
                 SummaryServiceModule(
                     name = "Onsite Adoption Support",
                     details = "man-days x ৳",
                     details_value = 0,
                     details_multiplier = 6000,
-                    totalamount = 0
+                    totalamount = costOnsiteAdoptionSupport
                 ),
                 SummaryServiceModule(
                     name = "Training",
                     details = "sessions x ৳",
                     details_value = 0,
                     details_multiplier = 6000,
-                    totalamount = 0
+                    totalamount = costTraining
                 ),
                 SummaryServiceModule(
                     name = "Project Management",
                     details = "man-days x ৳",
                     details_value = 0,
                     details_multiplier = 12000,
-                    totalamount = 0
+                    totalamount = costProjectManagement
                 )
             )
         )
@@ -235,7 +235,7 @@ class MainActivityViewModel @Inject constructor(
             }
         }
 
-        val summarySoftwareLicense = SummarySoftwareLicense(additionalusers = 0, users = 24,
+        val summarySoftwareLicense = SummarySoftwareLicense(additionalusers = additionalUsers, users = usersIncluded,
         header = "Software License", totalamount = totalAmount,
         modules = softwareLicenseModuleList)
 

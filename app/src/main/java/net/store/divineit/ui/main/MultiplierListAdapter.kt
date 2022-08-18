@@ -63,8 +63,6 @@ class MultiplierListAdapter internal constructor(
 
                 binding.slider.valueTo = sliderMaxRange.toFloat()
 
-                binding.maxText.text = "MAX ($sliderMaxRange)"
-
                 val sliderStepSize = 1 //item.slabConfig.increment ?: 1
 
                 binding.slider.stepSize = sliderStepSize.toFloat()
@@ -77,34 +75,54 @@ class MultiplierListAdapter internal constructor(
                 for ((index, slab) in item.slabs.withIndex()) {
                     val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
                     if (isNumber) {
-                        var prefix = ""
-                        if (item.slabTexts.size > index) {
-                            prefix = item.slabTexts[index]
-                        }
+                        if (item.slabConfig?.showRange == true) {
+                            var prefix = ""
+                            if (item.slabTexts.size > index) {
+                                prefix = item.slabTexts[index]
+                            }
 
-                        val increment = item.slabConfig?.increment ?: 0
-                        var startItem = increment
+                            val increment = 1
+                            var startItem = increment
 
-                        if (index > 0) {
+                            if (index > 0) {
+                                try {
+                                    val previousItem = item.slabs[index - 1].toDouble().toInt()
+                                    startItem = previousItem + increment
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+
                             try {
-                                val previousItem = item.slabs[index - 1].toDouble().toInt()
-                                startItem = previousItem + increment
+                                val slabPrice = slab.toDouble().toInt()
+                                val slabText = if (prefix.isBlank()) {
+                                    "$startItem-${slabPrice}"
+                                } else {
+                                    "$prefix($startItem-${slabPrice})"
+                                }
+                                binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
                             } catch (e: Exception) {
                                 e.printStackTrace()
+                                binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
                             }
-                        }
+                        } else {
+                            var prefix = ""
+                            if (item.slabTexts.size > index) {
+                                prefix = item.slabTexts[index]
+                            }
 
-                        try {
-                            val slabPrice = slab.toDouble().toInt()
-                            val slabText = if (prefix.isBlank()) {
-                                if (startItem == slabPrice) "$slabPrice" else "$startItem-${slabPrice}"
-                            } else {
-                                if (startItem == slabPrice) "$prefix(${slabPrice})" else "$prefix($startItem-${slabPrice})"
+                            try {
+                                val slabPrice = slab.toDouble().toInt()
+                                val slabText = if (prefix.isBlank()) {
+                                    "$slabPrice"
+                                } else {
+                                    "$prefix(${slabPrice})"
+                                }
+                                binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
                             }
-                            binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
                         }
                     } else {
                         binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
