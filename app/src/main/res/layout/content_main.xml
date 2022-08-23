@@ -42,17 +42,17 @@
                         android:textColor="@color/textColor1"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/logout"
-                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:backgroundTint="@color/blue1"
-                        android:text="Save Changes"
-                        android:textAllCaps="false"
-                        android:windowSoftInputMode="adjustResize"
-                        app:cornerRadius="5dp" />
+<!--                    <com.google.android.material.button.MaterialButton-->
+<!--                        android:id="@+id/logout"-->
+<!--                        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="16dp"-->
+<!--                        android:backgroundTint="@color/blue1"-->
+<!--                        android:text="Save Changes"-->
+<!--                        android:textAllCaps="false"-->
+<!--                        android:windowSoftInputMode="adjustResize"-->
+<!--                        app:cornerRadius="5dp" />-->
 
                 </LinearLayout>
 

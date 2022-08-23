@@ -16,4 +16,6 @@ object AppConstants {
     const val unitPriceCustomizedReports = 16000
     const val perUserCost = 50000
     const val additionalUsers = 5
+
+    const val labelCustom = "Custom"
 }

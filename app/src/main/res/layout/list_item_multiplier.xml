@@ -33,23 +33,44 @@
             app:chipSpacingVertical="6dp">
         </com.google.android.material.chip.ChipGroup>
 
-        <LinearLayout
-            android:id="@+id/linearSlider"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/customValueLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slider"
-                android:layout_width="0dp"
+            android:layout_marginBottom="10dp"
+            android:hint="Custom Value"
+            android:visibility="gone"
+            android:textColorHint="@color/gray5"
+            android:windowSoftInputMode="adjustResize"
+            app:boxCornerRadiusBottomEnd="5dp"
+            app:boxCornerRadiusBottomStart="5dp"
+            app:boxCornerRadiusTopEnd="5dp"
+            app:boxCornerRadiusTopStart="5dp"
+            app:boxStrokeColor="@color/edittext_box_stroke_color"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/gray5"
+            app:errorTextColor="@color/red1"
+            app:hintTextColor="@color/themeColor">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/customValue"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:valueFrom="0"
-                android:valueTo="50"
-                android:stepSize="1"
-                style="@style/Widget.App.Slider"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"/>
-        </LinearLayout>
+                android:imeOptions="actionDone"
+                android:text="@={item.customValue}"
+                android:importantForAutofill="yes"
+                android:inputType="text"
+                android:textColor="@color/textColor3" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="0"
+            android:valueTo="50"
+            android:stepSize="1"
+            style="@style/Widget.App.Slider"/>
     </LinearLayout>
 </layout>

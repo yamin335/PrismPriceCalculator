@@ -23,8 +23,11 @@ import net.store.divineit.ui.BaseServiceModuleListAdapter
 import net.store.divineit.ui.ModuleGroupAdapter
 import net.store.divineit.ui.ModuleGroupSummaryListAdapter
 import net.store.divineit.ui.base.BaseActivity
+import net.store.divineit.ui.home.HomeActivity
 import net.store.divineit.utils.AppConstants
 import net.store.divineit.ui.login.LoginActivity
+import net.store.divineit.utils.AppGlobalValues
+import net.store.divineit.utils.hideKeyboard
 import java.io.*
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -72,9 +75,16 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         moduleSummaryAdapter = ModuleGroupSummaryListAdapter()
         binding.appBarMain.contentMain.summarySheet.recyclerSummary.adapter = moduleSummaryAdapter
 
-        multiplierListAdapter = MultiplierListAdapter( callback = { index, multiplierCode, position ->
+        multiplierListAdapter = MultiplierListAdapter( callback = { index, multiplierCode, position, customValue ->
             viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabIndex = index
-            calculateModuleAndFeaturePrice(Pair(index, multiplierCode))
+            viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].customValue = customValue
+            if (viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabs.size == index) {
+                calculateModuleAndFeaturePrice(-1, multiplierCode, customValue)
+            } else {
+                hideKeyboard()
+                calculateModuleAndFeaturePrice(index, multiplierCode, customValue)
+            }
+
             calculateSummary()
             moduleGroupAdapter.notifyDataSetChanged()
         }, sliderCallback = { code, value ->
@@ -100,6 +110,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             baseModuleList?.let {
                 viewModel.baseModuleList = baseModuleList as ArrayList<BaseServiceModule>
                 baseServiceAdapter = BaseServiceModuleListAdapter(viewModel.baseModuleList) { baseModule, position ->
+                    hideKeyboard()
                     selectedBaseModulePosition = position
                     loadHeaderMultipliers(viewModel.baseModuleList[selectedBaseModulePosition])
                     binding.drawerLayout.closeDrawer(GravityCompat.END)
@@ -175,6 +186,10 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
             }
+        }
+
+        viewModel.quotationSubmitResponse.observe(this) {
+            goHome()
         }
 
         viewModel.productDetails(productId)
@@ -281,6 +296,15 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         val licensingParameters: ArrayList<LicensingParameter> = ArrayList()
 
         for (multiplier in baseModule.multipliers) {
+            if (multiplier.slabs.size == multiplier.slabIndex) {
+                if (multiplier.customValue.isNullOrBlank()) {
+                    multiplier.slabIndex = 0
+                } else {
+                    licensingParameters.add(LicensingParameter(multiplier.code, multiplier.customValue, 0))
+                    continue
+                }
+            }
+
             val slabIndex = multiplier.slabIndex
             if (multiplier.slabs.isNullOrEmpty()) continue
             val slab = multiplier.slabs[slabIndex]
@@ -475,7 +499,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         binding.appBarMain.contentMain.summarySheet.costTotal.text = costTotalText
     }
 
-    private fun calculateModuleAndFeaturePrice(pair: Pair<Int, String>) {
+    private fun calculateModuleAndFeaturePrice(index: Int, code: String, customValue: String) {
         if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.isNullOrEmpty()) return
 
         for (groupIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
@@ -484,23 +508,36 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
             for (moduleIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.indices) {
                 val moduleMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].multiplier
-                if (moduleMultiplierCode is String && moduleMultiplierCode == pair.second) {
-                    calculateModulePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex], pair.first)
+                if (moduleMultiplierCode is String && moduleMultiplierCode == code) {
+                    calculateModulePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex], index, customValue)
                 }
 
                 if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.isNullOrEmpty()) return
 
                 for (featureIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.indices) {
                     val featureMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].multiplier
-                    if (featureMultiplierCode is String && moduleMultiplierCode == pair.second) {
-                        calculateFeaturePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex], pair.first)
+                    if (featureMultiplierCode is String && moduleMultiplierCode == code) {
+                        calculateFeaturePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex], index, customValue)
                     }
                 }
             }
         }
     }
 
-    private fun calculateModulePrice(module:  ServiceModule, index: Int) {
+    private fun calculateModulePrice(module:  ServiceModule, index: Int, customValue: String) {
+        if (index == -1) {
+            try {
+                if (customValue.isBlank()) {
+                    module.defaultprice = 0.0
+                } else {
+                    module.defaultprice = customValue.toDouble()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                module.defaultprice = 0.0
+            }
+            return
+        }
         if (module.price.size <= index) return
         val price = module.price[index]
         if (price.isBlank()) return
@@ -511,7 +548,21 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         }
     }
 
-    private fun calculateFeaturePrice(feature:  Feature, index: Int) {
+    private fun calculateFeaturePrice(feature:  Feature, index: Int, customValue: String) {
+        if (index == -1) {
+            try {
+                if (customValue.isBlank()) {
+                    feature.defaultprice = 0.0
+                } else {
+                    feature.defaultprice = customValue.toDouble()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                feature.defaultprice = 0.0
+            }
+            return
+        }
+
         if (feature.price.size <= index) return
         val price = feature.price[index]
         if (price.isBlank()) return
@@ -553,6 +604,13 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 super.onOptionsItemSelected(item)
             }
         }
+    }
+
+    private fun goHome() {
+        val intent = Intent(this, HomeActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        startActivity(intent)
+        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 
     private fun goBack() {
