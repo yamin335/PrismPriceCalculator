@@ -7,7 +7,12 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.store.divineit.R
+import net.store.divineit.api.ApiCallStatus
 import net.store.divineit.databinding.ModuleGroupListItemBinding
 import net.store.divineit.models.Feature
 import net.store.divineit.models.ModuleGroup
@@ -18,6 +23,9 @@ class ModuleGroupAdapter internal constructor(
     private var dataList: List<ModuleGroup>,
     private val callback: (ModuleGroup) -> Unit
 ) : RecyclerView.Adapter<ModuleGroupAdapter.ViewHolder>() {
+
+    var modulesAlreadyLoadedForPosition: HashMap<Int, Boolean> = HashMap()
+    var itemNotified = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding: ModuleGroupListItemBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.list_item_module_group, parent, false)
@@ -32,14 +40,14 @@ class ModuleGroupAdapter internal constructor(
         return dataList.size
     }
 
-    fun submitList(dataList: List<ModuleGroup>) {
-        this.dataList = dataList  as ArrayList<ModuleGroup>
-        notifyDataSetChanged()
-    }
+//    fun submitList(dataList: List<ModuleGroup>) {
+//        this.dataList = dataList  as ArrayList<ModuleGroup>
+//        notifyDataSetChanged()
+//    }
 
-    fun notifyModuleItemChanged(moduleGroupListItemPosition: Int) {
-        notifyItemChanged(moduleGroupListItemPosition)
-    }
+//    fun notifyModuleItemChanged(moduleGroupListItemPosition: Int) {
+//        notifyItemChanged(moduleGroupListItemPosition)
+//    }
 
     inner class ViewHolder(private val binding: ModuleGroupListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
@@ -55,6 +63,7 @@ class ModuleGroupAdapter internal constructor(
                     binding.linearActions.visibility = View.GONE
                     binding.expandableLayout.isExpanded = true
                     dataList[position].isExpanded = true
+                    loadAllModules(position)
                 }
 
                 "PIP" -> {
@@ -63,6 +72,7 @@ class ModuleGroupAdapter internal constructor(
                     binding.linearActions.visibility = View.GONE
                     binding.expandableLayout.isExpanded = true
                     dataList[position].isExpanded = true
+                    loadAllModules(position)
                 }
 
                 else -> {
@@ -70,6 +80,13 @@ class ModuleGroupAdapter internal constructor(
                     binding.linearShowHide.visibility = View.VISIBLE
                     binding.linearActions.visibility = View.VISIBLE
                     binding.expandableLayout.isExpanded = item.isExpanded
+                    if (item.isExpanded) {
+                        binding.arrowClickToShow.animate().setDuration(200).rotation(180F)
+                        binding.clickToShow.text = "Click to hide Modules"
+                    } else {
+                        binding.arrowClickToShow.animate().setDuration(200).rotation(0F)
+                        binding.clickToShow.text = "Click to show Modules"
+                    }
                 }
             }
 
@@ -96,28 +113,15 @@ class ModuleGroupAdapter internal constructor(
 
             binding.topBar.setOnClickListener {
                 toggleExpanded(item, binding)
-                binding.expandableLayout.isExpanded = item.isExpanded
-            }
-
-            if (dataList[position].modules.isNotEmpty()) {
-                val moduleListAdapter = ModuleListAdapter(baseModuleCode, dataList[position].modules, {
-                    callback(dataList[position])
-                }, moduleChangeCallback = {
-                    notifyItemChanged(position)
-                    callback(dataList[position])
-                })
-                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-                innerLLM.initialPrefetchItemCount = 3
-
-                binding.recyclerModule.apply {
-                    visibility = View.VISIBLE
-                    isNestedScrollingEnabled = false
-                    setHasFixedSize(true)
-                    layoutManager = innerLLM
-                    adapter = moduleListAdapter
+                if (modulesAlreadyLoadedForPosition[position] == true) {
+                    binding.expandableLayout.isExpanded = item.isExpanded
+                } else {
+                    CoroutineScope(Dispatchers.Main.immediate).launch {
+                        delay(500)
+                        binding.expandableLayout.isExpanded = item.isExpanded
+                    }
                 }
-            } else {
-                binding.recyclerModule.visibility = View.GONE
+                loadAllModules(position)
             }
 
 //            val validMultipliersList = ArrayList<MultiplierClass>()
@@ -162,13 +166,52 @@ class ModuleGroupAdapter internal constructor(
                 clearAll(position)
             }
             //moduleListAdapter.submitList(item.modules)
+
+            if (itemNotified) {
+                loadAllModules(position)
+            }
+        }
+
+        private fun loadAllModules(position: Int) {
+            if (dataList[position].modules.isNotEmpty()) {
+                if (modulesAlreadyLoadedForPosition[position] == true) return
+                modulesAlreadyLoadedForPosition[position] = true
+                itemNotified = false
+                val moduleListAdapter = ModuleListAdapter(baseModuleCode, dataList[position].modules, {
+                    callback(dataList[position])
+                }, moduleChangeCallback = {
+                    modulesAlreadyLoadedForPosition[position] = false
+                    itemNotified = true
+                    notifyItemChanged(position)
+                    callback(dataList[position])
+                })
+                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+                innerLLM.initialPrefetchItemCount = 3
+
+                binding.recyclerModule.apply {
+                    visibility = View.VISIBLE
+                    isNestedScrollingEnabled = false
+                    //setHasFixedSize(true)
+                    layoutManager = innerLLM
+                    adapter = moduleListAdapter
+                }
+            } else {
+                binding.recyclerModule.visibility = View.GONE
+            }
         }
 
         private fun addAll(position: Int) {
+            var shouldNotify = false
             for (module in dataList[position].modules) {
-                if (!module.isAdded) module.isAdded = true
+                if (!module.isAdded) {
+                    module.isAdded = true
+                    shouldNotify = true
+                }
                 for (feature in module.features) {
-                    if (!feature.isAdded) feature.isAdded = true
+                    if (!feature.isAdded) {
+                        feature.isAdded = true
+                        shouldNotify = true
+                    }
                 }
 
 //                for (subModule in module.submodules) {
@@ -177,8 +220,13 @@ class ModuleGroupAdapter internal constructor(
 //                    }
 //                }
             }
-            notifyItemChanged(position)
-            callback(dataList[position])
+
+            if (shouldNotify) {
+                modulesAlreadyLoadedForPosition[position] = false
+                itemNotified = true
+                notifyItemChanged(position)
+                callback(dataList[position])
+            }
         }
 
         private fun toggleSelection(position: Int) {
@@ -199,15 +247,24 @@ class ModuleGroupAdapter internal constructor(
                 module.isAdded = !module.isAdded
                 module.isAdded = module.isAdded || isAdded
             }
+            modulesAlreadyLoadedForPosition[position] = false
+            itemNotified = true
             notifyItemChanged(position)
             callback(dataList[position])
         }
 
         private fun clearAll(position: Int) {
+            var shouldNotify = false
             for (module in dataList[position].modules) {
-                if (module.isAdded) module.isAdded = false
+                if (module.isAdded) {
+                    module.isAdded = false
+                    shouldNotify = true
+                }
                 for (feature in module.features) {
-                    if (feature.isAdded) feature.isAdded = false
+                    if (feature.isAdded) {
+                        feature.isAdded = false
+                        shouldNotify = true
+                    }
                 }
 
 //                for (subModule in module.submodules) {
@@ -216,8 +273,13 @@ class ModuleGroupAdapter internal constructor(
 //                    }
 //                }
             }
-            notifyItemChanged(position)
-            callback(dataList[position])
+
+            if (shouldNotify) {
+                modulesAlreadyLoadedForPosition[position] = false
+                itemNotified = true
+                notifyItemChanged(position)
+                callback(dataList[position])
+            }
         }
 
         private fun toggleExpanded(item: ModuleGroup, binding: ModuleGroupListItemBinding) {
@@ -225,9 +287,11 @@ class ModuleGroupAdapter internal constructor(
             if (item.isExpanded) {
                 binding.arrowClickToShow.animate().setDuration(200).rotation(180F)
                 binding.clickToShow.text = "Click to hide Modules"
+                //binding.recyclerModule.visibility = View.VISIBLE
             } else {
                 binding.arrowClickToShow.animate().setDuration(200).rotation(0F)
                 binding.clickToShow.text = "Click to show Modules"
+                //binding.recyclerModule.visibility = View.GONE
             }
         }
     }

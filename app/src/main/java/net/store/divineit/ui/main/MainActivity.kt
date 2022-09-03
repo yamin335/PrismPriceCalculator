@@ -17,6 +17,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.store.divineit.BR
 import net.store.divineit.R
+import net.store.divineit.api.ApiCallStatus
 import net.store.divineit.databinding.MainActivityBinding
 import net.store.divineit.models.*
 import net.store.divineit.ui.BaseServiceModuleListAdapter
@@ -75,19 +76,40 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         moduleSummaryAdapter = ModuleGroupSummaryListAdapter()
         binding.appBarMain.contentMain.summarySheet.recyclerSummary.adapter = moduleSummaryAdapter
 
-        multiplierListAdapter = MultiplierListAdapter( callback = { index, multiplierCode, position, customValue ->
+        multiplierListAdapter = MultiplierListAdapter( callback = { index, multiplierCode, position, customValue, baseModuleCode ->
+            hideKeyboard()
+            if (baseModuleCode == null || viewModel.baseModuleList[selectedBaseModulePosition].code == null ||
+                baseModuleCode != viewModel.baseModuleList[selectedBaseModulePosition].code) return@MultiplierListAdapter
+
             viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabIndex = index
             viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].customValue = customValue
+
             if (viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabs.size == index) {
                 calculateModuleAndFeaturePrice(-1, multiplierCode, customValue)
             } else {
-                hideKeyboard()
                 calculateModuleAndFeaturePrice(index, multiplierCode, customValue)
+                calculateSummary()
+                if (viewModel.responsibleMultipliersOfBaseModules[baseModuleCode] != null) {
+                    val map = viewModel.responsibleMultipliersOfBaseModules[baseModuleCode] ?: return@MultiplierListAdapter
+                    if (map[multiplierCode] == true) {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+                        CoroutineScope(Dispatchers.Main.immediate).launch {
+                            delay(1500)
+                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        }
+                        CoroutineScope(Dispatchers.Main.immediate).launch {
+                            delay(100)
+                            moduleGroupAdapter.modulesAlreadyLoadedForPosition = HashMap()
+                            moduleGroupAdapter.itemNotified = true
+                            moduleGroupAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
             }
+        }, sliderCallback = { code, value, baseModuleCode ->
+            if (baseModuleCode == null || viewModel.baseModuleList[selectedBaseModulePosition].code == null ||
+                baseModuleCode != viewModel.baseModuleList[selectedBaseModulePosition].code) return@MultiplierListAdapter
 
-            calculateSummary()
-            moduleGroupAdapter.notifyDataSetChanged()
-        }, sliderCallback = { code, value ->
             when (code) {
                 "custom" -> {
                     viewModel.costSoftwareCustomization = value * AppConstants.unitPriceSoftwareCustomization
@@ -112,14 +134,31 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 baseServiceAdapter = BaseServiceModuleListAdapter(viewModel.baseModuleList) { baseModule, position ->
                     hideKeyboard()
                     selectedBaseModulePosition = position
+//                    for (moduleGroupIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
+//                        viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[moduleGroupIndex].isExpanded =
+//                            baseModule.code == "START"
+//                    }
                     loadHeaderMultipliers(viewModel.baseModuleList[selectedBaseModulePosition])
                     binding.drawerLayout.closeDrawer(GravityCompat.END)
+//                    viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+//                    CoroutineScope(Dispatchers.Main.immediate).launch {
+//                        delay(1500)
+//                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+//                    }
                     CoroutineScope(Dispatchers.Main.immediate).launch {
-                        delay(250)
-                        moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[selectedBaseModulePosition].code ?: "", viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups ?: ArrayList()) {
+                        //delay(250)
+                        moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[selectedBaseModulePosition].code ?: "",
+                            viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups
+                        ) {
                             calculateSummary()
                         }
+
+                        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+                        innerLLM.initialPrefetchItemCount = 1
+
                         binding.appBarMain.contentMain.recyclerView.apply {
+                            isNestedScrollingEnabled = false
+                            layoutManager = innerLLM
                             adapter = moduleGroupAdapter
                         }
                     }
@@ -128,21 +167,24 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 if (it.isEmpty()) return@observe
                 loadHeaderMultipliers(it[0])
 
-                moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[0].code ?: "", viewModel.baseModuleList[0].moduleGroups ?: ArrayList()) {
+                moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[0].code ?: "",
+                    viewModel.baseModuleList[0].moduleGroups
+                ) {
                     calculateSummary()
                 }
 
                 val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-                innerLLM.initialPrefetchItemCount = 3
+                innerLLM.initialPrefetchItemCount = 1
 
                 binding.appBarMain.contentMain.recyclerView.apply {
                     isNestedScrollingEnabled = false
-                    setHasFixedSize(true)
+                    //setHasFixedSize(true)
                     layoutManager = innerLLM
                     adapter = moduleGroupAdapter
                 }
                 calculateSummary()
             }
+            viewModel.baseModuleListTemp.postValue(null)
         }
 
         summarySheetBehavior = BottomSheetBehavior.from(binding.appBarMain.contentMain.summarySheet.root)
@@ -402,7 +444,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         }
         baseModule.multipliers = validMultipliers
         binding.appBarMain.contentMain.linearHeader.visibility = if (baseModule.multipliers.isEmpty()) View.GONE else View.VISIBLE
-        multiplierListAdapter.submitList(baseModule.multipliers)
+        multiplierListAdapter.submitList(baseModule.multipliers, baseModule.code)
     }
 
     private fun calculateSummaryCost(moduleCost: Int) {
@@ -414,6 +456,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
         viewModel.costRequirementAnalysis = (viewModel.costSoftwareLicense * AppConstants.percentRequirementAnalysis) / 100
         viewModel.costDeployment = (viewModel.costSoftwareLicense * AppConstants.percentDeployment) / 100
+        viewModel.costConfiguration = (viewModel.costSoftwareLicense * AppConstants.percentConfiguration) / 100
         viewModel.costOnsiteAdoptionSupport = (viewModel.costSoftwareLicense * AppConstants.percentOnSiteAdoption) / 100
         viewModel.costTraining = (viewModel.costSoftwareLicense * AppConstants.percentTraining) / 100
         viewModel.costProjectManagement = (viewModel.costSoftwareLicense * AppConstants.percentProjectManagement) / 100

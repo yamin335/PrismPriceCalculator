@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
@@ -18,10 +19,11 @@ import net.store.divineit.models.MultiplierClass
 import net.store.divineit.utils.AppConstants
 
 class MultiplierListAdapter internal constructor(
-    private val callback: (Int, String, Int, String) -> Unit,
-    private val sliderCallback: (String, Int) -> Unit
+    private val callback: (Int, String, Int, String, String?) -> Unit,
+    private val sliderCallback: (String, Int, String?) -> Unit
 ) : RecyclerView.Adapter<MultiplierListAdapter.ViewHolder>() {
 
+    private var baseModuleCode: String? = ""
     private var dataList: ArrayList<MultiplierClass> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -37,7 +39,8 @@ class MultiplierListAdapter internal constructor(
         return dataList.size
     }
 
-    fun submitList(dataList: List<MultiplierClass>) {
+    fun submitList(dataList: List<MultiplierClass>, baseModuleCode: String?) {
+        this.baseModuleCode = baseModuleCode
         this.dataList = dataList  as ArrayList<MultiplierClass>
         notifyDataSetChanged()
     }
@@ -51,6 +54,7 @@ class MultiplierListAdapter internal constructor(
             binding.chipGroup.removeAllViews()
 
             if (item.slabConfig?.inputType == "slider") {
+                binding.customValueLayout.visibility = View.GONE
                 binding.slider.visibility = View.VISIBLE
 //                if (item.slabs.isEmpty()) {
 //                    binding.linearSlider.visibility = View.GONE
@@ -72,7 +76,7 @@ class MultiplierListAdapter internal constructor(
                 binding.slider.stepSize = sliderStepSize.toFloat()
 
                 binding.slider.addOnChangeListener { slider, value, fromUser -> /* `value` is the argument you need */
-                    sliderCallback(item.code ?: "", value.toInt())
+                    sliderCallback(item.code ?: "", value.toInt(), baseModuleCode)
                 }
             } else {
                 binding.slider.visibility = View.GONE
@@ -138,7 +142,7 @@ class MultiplierListAdapter internal constructor(
                         item.slabIndex), item.slabs.size)
                 }
 
-                binding.customValueLayout.visibility = if (item.slabs.size == item.slabIndex) View.VISIBLE else View.GONE
+                binding.customValueLayout.visibility = if (item.slabs.isNotEmpty() && item.slabs.size == item.slabIndex) View.VISIBLE else View.GONE
 
                 binding.chipGroup.setOnCheckedStateChangeListener { group, checkedIds ->
                     if (checkedIds.size == 1) {
@@ -147,19 +151,37 @@ class MultiplierListAdapter internal constructor(
                         } else {
                             item.customValue = ""
                             binding.customValueLayout.visibility = View.GONE
-                            callback(checkedIds[0], item.code ?: "", position, item.customValue ?: "")
+                            callback(checkedIds[0], item.code ?: "", position, item.customValue ?: "", baseModuleCode)
+                            notifyItemChanged(position)
                         }
                     }
                 }
 
-                binding.customValue.addTextChangedListener(object : TextWatcher {
-                    override fun onTextChanged(cs: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
-                        callback(item.slabs.size, item.code ?: "", position, cs.toString())
+                binding.customValue.setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        callback(item.slabs.size, item.code ?: "", position, item.customValue ?: "", baseModuleCode)
+                        return@setOnEditorActionListener true
                     }
+                    false
+                }
 
-                    override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) {}
-                    override fun afterTextChanged(arg0: Editable) {}
-                })
+//                val textWatcher = object : TextWatcher {
+//                    override fun onTextChanged(cs: CharSequence, arg1: Int, arg2: Int, arg3: Int) {
+//                        val newValue = cs.toString()
+//                        val oldValue = item.customValue
+//                        if (oldValue == newValue || (oldValue.isNullOrBlank() && newValue.isBlank())) return
+//                        callback(item.slabs.size, item.code ?: "", position, cs.toString(), baseModuleCode)
+//                    }
+//
+//                    override fun beforeTextChanged(arg0: CharSequence, arg1: Int, arg2: Int, arg3: Int) {}
+//                    override fun afterTextChanged(arg0: Editable) {}
+//                }
+//
+//                binding.customValue.removeTextChangedListener(textWatcher)
+//
+//                binding.customValue.setText(item.customValue)
+//
+//                binding.customValue.addTextChangedListener(textWatcher)
             }
         }
     }
@@ -174,6 +196,5 @@ class MultiplierListAdapter internal constructor(
             setRippleColorResource(R.color.chip_ripple_color)
             isChecked = chipId == slabIndex
         }
-
     }
 }

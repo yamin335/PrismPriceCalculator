@@ -161,11 +161,11 @@ class ModuleListAdapter internal constructor(
             }
 
             val innerLLM2 = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-            innerLLM2.initialPrefetchItemCount = 3
+            //innerLLM2.initialPrefetchItemCount = 3
 
             binding.recyclerFeatures.apply {
                 isNestedScrollingEnabled = false
-                setHasFixedSize(true)
+                //setHasFixedSize(true)
                 layoutManager = innerLLM2
                 adapter = featureListAdapter
             }

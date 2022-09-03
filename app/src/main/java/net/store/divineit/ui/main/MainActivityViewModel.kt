@@ -39,7 +39,9 @@ class MainActivityViewModel @Inject constructor(
     var costAnnualMaintenanceTotal = 0
     var costAnnualMaintenance = 0
     var costTotal = 0
-    
+
+    var responsibleMultipliersOfBaseModules: HashMap<String, HashMap<String, Boolean>> = HashMap()
+
     val summaryMap: HashMap<String, ModuleGroupSummary> = HashMap()
     val softwareLicenseModuleMap: HashMap<String, SoftwareLicenseModule> = HashMap()
 
@@ -65,15 +67,37 @@ class MainActivityViewModel @Inject constructor(
             viewModelScope.launch(handler) {
                 when (val apiResponse = ApiResponse.create(homeRepository.productDetails(productId))) {
                     is ApiSuccessResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         when(apiResponse.body.code) {
                             2000001 -> {
-                                baseModuleListTemp.postValue(apiResponse.body.data?.Modules)
+                                val baseModules = apiResponse.body.data?.Modules
+                                if (!baseModules.isNullOrEmpty()) {
+                                    val baseMultiplierMap: HashMap<String, HashMap<String, Boolean>> = HashMap()
+                                    for (baseModule in baseModules) {
+                                        val multiplierMap: HashMap<String, Boolean> = HashMap()
+                                        for (moduleGroup in baseModule.moduleGroups) {
+                                            for (module in moduleGroup.modules) {
+                                                val moduleMultiplier = module.multiplier
+                                                if (!moduleMultiplier.isNullOrBlank()) multiplierMap[moduleMultiplier] = true
+
+                                                for (feature in module.features) {
+                                                    val featureMultiplier = feature.multiplier
+                                                    if (!featureMultiplier.isNullOrBlank()) multiplierMap[featureMultiplier] = true
+                                                }
+                                            }
+                                        }
+                                        val baseModuleCode = baseModule.code
+                                        if (!baseModuleCode.isNullOrBlank()) baseMultiplierMap[baseModuleCode] = multiplierMap
+                                    }
+                                    responsibleMultipliersOfBaseModules = baseMultiplierMap
+                                    apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                                }
+                                baseModuleListTemp.postValue(baseModules)
                             }
                             else -> {
                                 toastError.postValue("Failed! Please try again.")
                             }
                         }
+                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                     }
                     is ApiEmptyResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.EMPTY)

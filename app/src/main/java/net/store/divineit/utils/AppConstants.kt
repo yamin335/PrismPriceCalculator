@@ -7,6 +7,7 @@ object AppConstants {
     const val percentRequirementAnalysis = 10
     const val percentDeployment = 5
     const val percentOnSiteAdoption = 5
+    const val percentConfiguration = 5
     const val percentTraining = 3
     const val percentProjectManagement = 10
     const val percentConsultancy = 10

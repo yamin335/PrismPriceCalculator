@@ -60,7 +60,7 @@
                 android:imeOptions="actionDone"
                 android:text="@={item.customValue}"
                 android:importantForAutofill="yes"
-                android:inputType="text"
+                android:inputType="numberDecimal"
                 android:textColor="@color/textColor3" />
         </com.google.android.material.textfield.TextInputLayout>
 
