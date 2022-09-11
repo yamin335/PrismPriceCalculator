@@ -5,9 +5,4 @@
         android:title="@string/logout"
         android:orderInCategory="100"
         app:showAsAction="always" />
-
-    <item android:id="@+id/myQuotations"
-        android:title="@string/my_quotations"
-        android:orderInCategory="100"
-        app:showAsAction="collapseActionView" />
 </menu>

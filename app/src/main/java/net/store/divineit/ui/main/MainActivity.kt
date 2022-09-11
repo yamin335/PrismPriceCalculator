@@ -52,6 +52,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
     private lateinit var moduleSummaryAdapter: ModuleGroupSummaryListAdapter
     private var selectedBaseModulePosition = 0
     private lateinit var multiplierListAdapter: MultiplierListAdapter
+    private var isQuotationDetails = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,7 +122,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                     calculateSummary()
                 }
             }
-        })
+        }, viewModel.costSoftwareCustomization, viewModel.costCustomizedReport)
 
         binding.appBarMain.contentMain.multipliers.apply {
             setHasFixedSize(true)
@@ -130,59 +131,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
         viewModel.baseModuleListTemp.observe(this) { baseModuleList ->
             baseModuleList?.let {
-                viewModel.baseModuleList = baseModuleList as ArrayList<BaseServiceModule>
-                baseServiceAdapter = BaseServiceModuleListAdapter(viewModel.baseModuleList) { baseModule, position ->
-                    hideKeyboard()
-                    selectedBaseModulePosition = position
-//                    for (moduleGroupIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
-//                        viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[moduleGroupIndex].isExpanded =
-//                            baseModule.code == "START"
-//                    }
-                    loadHeaderMultipliers(viewModel.baseModuleList[selectedBaseModulePosition])
-                    binding.drawerLayout.closeDrawer(GravityCompat.END)
-//                    viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-//                    CoroutineScope(Dispatchers.Main.immediate).launch {
-//                        delay(1500)
-//                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-//                    }
-                    CoroutineScope(Dispatchers.Main.immediate).launch {
-                        //delay(250)
-                        moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[selectedBaseModulePosition].code ?: "",
-                            viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups
-                        ) {
-                            calculateSummary()
-                        }
-
-                        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-                        innerLLM.initialPrefetchItemCount = 1
-
-                        binding.appBarMain.contentMain.recyclerView.apply {
-                            isNestedScrollingEnabled = false
-                            layoutManager = innerLLM
-                            adapter = moduleGroupAdapter
-                        }
-                    }
-                }
-                binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
-                if (it.isEmpty()) return@observe
-                loadHeaderMultipliers(it[0])
-
-                moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[0].code ?: "",
-                    viewModel.baseModuleList[0].moduleGroups
-                ) {
-                    calculateSummary()
-                }
-
-                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
-                innerLLM.initialPrefetchItemCount = 1
-
-                binding.appBarMain.contentMain.recyclerView.apply {
-                    isNestedScrollingEnabled = false
-                    //setHasFixedSize(true)
-                    layoutManager = innerLLM
-                    adapter = moduleGroupAdapter
-                }
-                calculateSummary()
+                prepareBaseModuleListUI(it, null)
             }
             viewModel.baseModuleListTemp.postValue(null)
         }
@@ -223,7 +172,31 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
                 summarySheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
             if (preferencesHelper.isLoggedIn) {
-                viewModel.submitSummary()
+                if (isQuotationDetails) {
+                    if (viewModel.moduleChangeMapOld.isNotEmpty()
+                        && viewModel.moduleChangeMapNew.isNotEmpty()
+                        && viewModel.moduleChangeMapOld.size != viewModel.moduleChangeMapNew.size) {
+                        // Update summary
+                        viewModel.submitOrUpdateSummary(viewModel.quotationDetails)
+                    } else {
+                        var hasChanged = false
+                        for (key in viewModel.moduleChangeMapOld.keys) {
+                            if (viewModel.moduleChangeMapOld[key] != viewModel.moduleChangeMapNew[key]) {
+                                hasChanged = true
+                                break
+                            }
+                        }
+
+                        if (hasChanged) {
+                            // Update summary
+                            viewModel.submitOrUpdateSummary(viewModel.quotationDetails)
+                        } else {
+                            viewModel.toastWarning.postValue("No changes found!")
+                        }
+                    }
+                } else {
+                    viewModel.submitOrUpdateSummary(null)
+                }
             } else {
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
@@ -234,35 +207,183 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
             goHome()
         }
 
-        viewModel.productDetails(productId)
+        viewModel.quotationDetailsResponse.observe(this) { response ->
+            response?.let {
+                viewModel.quotationDetails = it.first
+                prepareBaseModuleListUI(it.second ?: ArrayList(), it.first)
+            }
+            viewModel.quotationDetailsResponse.postValue(null)
+        }
 
-        //        mDrawerToggle = object : ActionBarDrawerToggle(this, binding.drawerLayout, binding.appBarMain.toolbar,
-//            R.string.open,
-//            R.string.close
-//        ) {
-//            override fun onDrawerClosed(drawerView: View) {
-//                super.onDrawerClosed(drawerView)
-//            }
-//
-//            override fun onDrawerOpened(drawerView: View) {
-//                super.onDrawerOpened(drawerView)
-//            }
-//        }
-//        binding.drawerLayout.addDrawerListener(mDrawerToggle)
+        val bundle = intent.extras
+        if (bundle == null) {
+            viewModel.productDetails(productId)
+        } else {
+            val quotationId = bundle.getString(AppConstants.KEY_QUOTATION_ID, "")
+            val productId = bundle.getString(AppConstants.KEY_PRODUCT_ID, "")
+            isQuotationDetails = true
+            viewModel.quotationDetails(productId, quotationId)
+        }
+    }
 
-//        val inputStream: InputStream = resources.openRawResource(R.raw.divine)
-//        val writer: Writer = StringWriter()
-//        val buffer = CharArray(1024)
-//        inputStream.use { stream ->
-//            val reader: Reader = BufferedReader(InputStreamReader(stream, "UTF-8"))
-//            var n: Int
-//            while (reader.read(buffer).also { n = it } != -1) {
-//                writer.write(buffer, 0, n)
-//            }
-//        }
-//
-//        val jsonString: String = writer.toString()
-//        baseModuleList = Gson().fromJson(jsonString, Array<BaseServiceModule>::class.java).toList()
+    private fun prepareBaseModuleListUI(baseModuleList: List<BaseServiceModule>, quotation: SummaryResponseQuotation?) {
+        val quotationModuleMap: HashMap<String, SummaryResponseFeature> = HashMap()
+        val multiplierMap: HashMap<String?, Pair<String?, Int?>> = HashMap()
+
+        if (quotation != null) {
+            quotation.Customization?.modules?.let {
+                for (item in it) {
+                    when (item.name) {
+                        "Software Customization" -> {
+                            viewModel.costSoftwareCustomization = (item.details_value ?: 0) * (item.details_multiplier ?: 0)
+                        }
+
+                        "Customized Report" -> {
+                            viewModel.costCustomizedReport = (item.details_value ?: 0) * (item.details_multiplier ?: 0)
+                        }
+                    }
+                }
+            }
+
+            val softwareLicenseModules = quotation.Software_License?.modules ?: ArrayList()
+            for (module in softwareLicenseModules) {
+                viewModel.moduleChangeMapOld[module.code] = module.totalamount
+                viewModel.moduleChangeMapNew[module.code] = module.totalamount
+                val parameters = module.licensingparameters ?: ArrayList()
+                for (param in parameters) {
+                    multiplierMap["${param.name}${module.code}"] = Pair(param.value, null)
+                }
+                if (module.features.isNullOrEmpty()) continue
+                for (feature in module.features) {
+                    quotationModuleMap[feature.code ?: ""] = feature
+                }
+
+                viewModel.summaryMap[module.code ?: ""] = ModuleGroupSummary(module.code ?: "", module.name ?: "",
+                    module.totalamount ?: 0)
+                viewModel.softwareLicenseModuleMap[module.code ?: ""] = module
+            }
+
+            if (quotationModuleMap.isNotEmpty()) {
+                for (baseIndex in viewModel.baseModuleList.indices) {
+                    for (multiplierIndex in viewModel.baseModuleList[baseIndex].multipliers.indices) {
+                        val multiplier = viewModel.baseModuleList[baseIndex].multipliers[multiplierIndex]
+                        if (multiplier.slabLabels.isNullOrEmpty()) continue
+                        var isCustomValue = false
+                        val keyCode = "${multiplier.code}${viewModel.baseModuleList[baseIndex].code}"
+                        val pair = multiplierMap[keyCode]
+                        if (pair != null) {
+                            slabLoop@ for (slabIndex in multiplier.slabLabels.indices) {
+                                val slabLabel = viewModel.baseModuleList[baseIndex].multipliers[multiplierIndex].slabLabels[slabIndex]
+                                if (pair.first == slabLabel) {
+                                    viewModel.baseModuleList[baseIndex].multipliers[multiplierIndex].slabIndex = slabIndex
+                                    multiplierMap[keyCode] = Pair(pair.first, slabIndex)
+                                    isCustomValue = false
+                                    break@slabLoop
+                                } else {
+                                    // Custom value
+                                    isCustomValue = true
+                                }
+                            }
+                            if (isCustomValue) {
+                                viewModel.baseModuleList[baseIndex].multipliers[multiplierIndex].customValue = pair.first
+                                viewModel.baseModuleList[baseIndex].multipliers[multiplierIndex].slabIndex = viewModel.baseModuleList[baseIndex].multipliers[multiplierIndex].slabLabels.size
+                            }
+                        }
+                    }
+                    if (viewModel.baseModuleList[baseIndex].moduleGroups.isNullOrEmpty()) continue
+
+                    for (groupIndex in viewModel.baseModuleList[baseIndex].moduleGroups.indices) {
+
+                        if (viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules.isNullOrEmpty()) continue
+
+                        for (moduleIndex in viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules.indices) {
+                            val moduleMultiplierCode = viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].multiplier
+                            val keyModule = "$moduleMultiplierCode${viewModel.baseModuleList[baseIndex].code}"
+                            val pair = multiplierMap[keyModule]
+                            if (pair != null) {
+                                val slabIndex = pair.second
+                                if (slabIndex != null) {
+                                    calculateModulePrice(baseIndex, groupIndex, moduleIndex, slabIndex, "")
+                                }
+                            }
+                            val moduleCode = viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].code
+                            val summaryModule = quotationModuleMap[moduleCode]
+                            if (summaryModule != null) {
+                                viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].isAdded = true
+                            }
+
+                            if (viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features.isNullOrEmpty()) continue
+
+                            for (featureIndex in viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features.indices) {
+                                val featureMultiplierCode = viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].multiplier
+                                val keyFeature = "$featureMultiplierCode${viewModel.baseModuleList[baseIndex].code}"
+                                val pair2 = multiplierMap[keyFeature]
+                                if (pair2 != null) {
+                                    val slabIndex = pair2.second
+                                    if (slabIndex != null) {
+                                        calculateFeaturePrice(baseIndex, groupIndex, moduleIndex, featureIndex, slabIndex, "")
+                                    }
+                                }
+                                val featureCode = viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].code
+                                val summaryFeature = quotationModuleMap[featureCode]
+                                if (summaryFeature != null) {
+                                    viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].isAdded = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        baseServiceAdapter = BaseServiceModuleListAdapter(viewModel.baseModuleList) { baseModule, position ->
+            hideKeyboard()
+            selectedBaseModulePosition = position
+            loadHeaderMultipliers(viewModel.baseModuleList[selectedBaseModulePosition])
+            binding.drawerLayout.closeDrawer(GravityCompat.END)
+//                    viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+//                    CoroutineScope(Dispatchers.Main.immediate).launch {
+//                        delay(1500)
+//                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+//                    }
+            CoroutineScope(Dispatchers.Main.immediate).launch {
+                //delay(250)
+                moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[selectedBaseModulePosition].code ?: "",
+                    viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups
+                ) {
+                    calculateSummary()
+                }
+
+                val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+                innerLLM.initialPrefetchItemCount = 1
+
+                binding.appBarMain.contentMain.recyclerView.apply {
+                    isNestedScrollingEnabled = false
+                    layoutManager = innerLLM
+                    adapter = moduleGroupAdapter
+                }
+            }
+        }
+        binding.baseServiceModuleRecycler.adapter = baseServiceAdapter
+        if (baseModuleList.isEmpty()) return
+        loadHeaderMultipliers(baseModuleList[0])
+
+        moduleGroupAdapter = ModuleGroupAdapter(viewModel.baseModuleList[0].code ?: "",
+            viewModel.baseModuleList[0].moduleGroups
+        ) {
+            calculateSummary()
+        }
+
+        val innerLLM = LinearLayoutManager(binding.root.context, LinearLayoutManager.VERTICAL, false)
+        innerLLM.initialPrefetchItemCount = 1
+
+        binding.appBarMain.contentMain.recyclerView.apply {
+            isNestedScrollingEnabled = false
+            //setHasFixedSize(true)
+            layoutManager = innerLLM
+            adapter = moduleGroupAdapter
+        }
+        calculateSummary()
     }
 
     private fun setUpToolbar() {
@@ -276,7 +397,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         var isAdded = false
         var price = 0
 
-        val summaryModuleFeatureList: ArrayList<SummaryModuleFeature> = ArrayList()
+        val summaryModuleFeatureList: ArrayList<SummaryResponseFeature> = ArrayList()
         var summaryModuleTotalPrice = 0
 
         for (moduleGroup in baseModule.moduleGroups) {
@@ -301,9 +422,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
                     price += slabPrice
                     summaryModuleTotalPrice += slabPrice
-                    summaryModuleFeatureList.add(SummaryModuleFeature(name = module.name, code = module.code, multiplier = module.multiplier,
-                        multipliercode = "", price = module.price, type = "module", defaultprice = module.defaultprice.toInt(),
-                        totalamount = module.defaultprice.toInt()))
+                    summaryModuleFeatureList.add(SummaryResponseFeature(name = module.name, code = module.code, parentcode = "",
+                        description = module.description, multiplier = module.multiplier, multipliercode = "", excludeInAll = false,
+                        type = "module", discount = 0, totalamount = module.defaultprice.toInt(), price = module.price, defaultprice = module.defaultprice))
                     isAdded = true
                 }
 
@@ -327,8 +448,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
                         price += slabPrice
                         summaryModuleTotalPrice += slabPrice
-                        summaryModuleFeatureList.add(SummaryModuleFeature(name = feature.name, code = feature.code, multiplier = feature.multiplier,
-                            multipliercode = "", price = feature.price, type = "feature", defaultprice = feature.defaultprice.toInt(), totalamount = feature.defaultprice.toInt()))
+                        summaryModuleFeatureList.add(SummaryResponseFeature(name = feature.name, code = feature.code, parentcode = feature.parentcode,
+                        description = feature.description, multiplier = feature.multiplier, multipliercode = feature.multipliercode, excludeInAll = false,
+                        type = "feature", discount = 0, totalamount = feature.defaultprice.toInt(), price = feature.price, defaultprice = feature.defaultprice))
                         isAdded = true
                     }
                 }
@@ -349,77 +471,28 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
             val slabIndex = multiplier.slabIndex
             if (multiplier.slabs.isNullOrEmpty()) continue
-            val slab = multiplier.slabs[slabIndex]
-            val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
-            val param: LicensingParameter = if (isNumber) {
-                if (multiplier.slabConfig?.showRange == true) {
-                    var prefix = ""
-                    if (multiplier.slabTexts.size > slabIndex) {
-                        prefix = multiplier.slabTexts[slabIndex]
-                    }
-
-                    val increment = 1
-                    var startItem = increment
-
-                    if (slabIndex > 0) {
-                        try {
-                            val previousItem = multiplier.slabs[slabIndex - 1].toDouble().toInt()
-                            startItem = previousItem + increment
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
-
-                    try {
-                        val slabPrice = slab.toDouble().toInt()
-                        val slabText = if (prefix.isBlank()) {
-                            "$startItem-${slabPrice}"
-                        } else {
-                            "$prefix($startItem-${slabPrice})"
-                        }
-                        LicensingParameter(multiplier.code, slabText, 0)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        LicensingParameter(multiplier.code, slab, 0)
-                    }
-                } else {
-                    var prefix = ""
-                    if (multiplier.slabTexts.size > slabIndex) {
-                        prefix = multiplier.slabTexts[slabIndex]
-                    }
-
-                    try {
-                        val slabPrice = slab.toDouble().toInt()
-                        val slabText = if (prefix.isBlank()) {
-                            "$slabPrice"
-                        } else {
-                            "$prefix(${slabPrice})"
-                        }
-                        LicensingParameter(multiplier.code, slabText, 0)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        LicensingParameter(multiplier.code, slab, 0)
-                    }
-                }
-            } else {
-                LicensingParameter(multiplier.code, slab, 0)
-            }
-            licensingParameters.add(param)
+            val slabLabel = multiplier.slabLabels[slabIndex]
+            licensingParameters.add(LicensingParameter(multiplier.code, slabLabel, 0))
         }
 
         if (selectedBaseModulePosition == 0) {
-            viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SoftwareLicenseModule(name = baseModule. name,
-                totalamount = summaryModuleTotalPrice, code = baseModule.code,
-                licensingparameters = licensingParameters, features = summaryModuleFeatureList)
+            viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SummaryResponseSoftwareLicenseModule(licensingparameters = licensingParameters,
+                name = baseModule.name, code = baseModule.code, description = "", selfcode = "", defaultprice = 0, totalamount = summaryModuleTotalPrice,
+                discount = 0, features = summaryModuleFeatureList, multiplier = "", price = null, excludeInAll = false)
         } else {
             if (isAdded) {
                 viewModel.summaryMap[baseModule.code ?: ""] = ModuleGroupSummary(baseModule.code ?: "", baseModule.name ?: "", price)
-                viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SoftwareLicenseModule(name = baseModule. name,
-                    totalamount = summaryModuleTotalPrice, code = baseModule.code,
-                    licensingparameters = licensingParameters, features = summaryModuleFeatureList)
+
+                viewModel.softwareLicenseModuleMap[baseModule.code ?: ""] = SummaryResponseSoftwareLicenseModule(licensingparameters = licensingParameters,
+                name = baseModule.name, code = baseModule.code, description = "", selfcode = "", defaultprice = 0, totalamount = summaryModuleTotalPrice,
+                discount = 0, features = summaryModuleFeatureList, multiplier = "", price = null, excludeInAll = false)
+
+                viewModel.moduleChangeMapNew[baseModule.code] = price
             } else {
                 viewModel.summaryMap.remove(key = baseModule.code)
                 viewModel.softwareLicenseModuleMap.remove(key = baseModule.code)
+
+                viewModel.moduleChangeMapNew.remove(key = baseModule.code)
             }
         }
 
@@ -444,7 +517,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         }
         baseModule.multipliers = validMultipliers
         binding.appBarMain.contentMain.linearHeader.visibility = if (baseModule.multipliers.isEmpty()) View.GONE else View.VISIBLE
-        multiplierListAdapter.submitList(baseModule.multipliers, baseModule.code)
+        multiplierListAdapter.submitList(baseModule.multipliers, baseModule.code, viewModel.costSoftwareCustomization, viewModel.costCustomizedReport)
     }
 
     private fun calculateSummaryCost(moduleCost: Int) {
@@ -547,37 +620,37 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
         for (groupIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups.indices) {
 
-            if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.isNullOrEmpty()) return
+            if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.isNullOrEmpty()) continue
 
             for (moduleIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules.indices) {
                 val moduleMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].multiplier
                 if (moduleMultiplierCode is String && moduleMultiplierCode == code) {
-                    calculateModulePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex], index, customValue)
+                    calculateModulePrice(selectedBaseModulePosition, groupIndex, moduleIndex, index, customValue)
                 }
 
-                if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.isNullOrEmpty()) return
+                if (viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.isNullOrEmpty()) continue
 
                 for (featureIndex in viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features.indices) {
                     val featureMultiplierCode = viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].multiplier
                     if (featureMultiplierCode is String && moduleMultiplierCode == code) {
-                        calculateFeaturePrice(viewModel.baseModuleList[selectedBaseModulePosition].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex], index, customValue)
+                        calculateFeaturePrice(selectedBaseModulePosition, groupIndex, moduleIndex, featureIndex, index, customValue)
                     }
                 }
             }
         }
     }
 
-    private fun calculateModulePrice(module:  ServiceModule, index: Int, customValue: String) {
+    private fun calculateModulePrice(baseIndex: Int, groupIndex: Int, moduleIndex: Int, index: Int, customValue: String) {
+        val module = viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex]
         if (index == -1) {
             try {
                 if (customValue.isBlank()) {
-                    module.defaultprice = 0.0
+                    viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].defaultprice = 0.0
                 } else {
-                    module.defaultprice = customValue.toDouble()
+                    viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].defaultprice = customValue.toDouble()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                module.defaultprice = 0.0
             }
             return
         }
@@ -585,23 +658,23 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         val price = module.price[index]
         if (price.isBlank()) return
         try {
-            module.defaultprice = price.toDouble()
+            viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].defaultprice = price.toDouble()
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun calculateFeaturePrice(feature:  Feature, index: Int, customValue: String) {
+    private fun calculateFeaturePrice(baseIndex: Int, groupIndex: Int, moduleIndex: Int, featureIndex: Int, index: Int, customValue: String) {
+        val feature = viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex]
         if (index == -1) {
             try {
                 if (customValue.isBlank()) {
-                    feature.defaultprice = 0.0
+                    viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].defaultprice = 0.0
                 } else {
-                    feature.defaultprice = customValue.toDouble()
+                    viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].defaultprice = customValue.toDouble()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                feature.defaultprice = 0.0
             }
             return
         }
@@ -610,7 +683,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
         val price = feature.price[index]
         if (price.isBlank()) return
         try {
-            feature.defaultprice = price.toDouble()
+            viewModel.baseModuleList[baseIndex].moduleGroups[groupIndex].modules[moduleIndex].features[featureIndex].defaultprice = price.toDouble()
         } catch (e: Exception) {
             e.printStackTrace()
         }

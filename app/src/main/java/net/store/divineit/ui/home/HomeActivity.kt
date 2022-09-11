@@ -13,6 +13,7 @@ import net.store.divineit.ui.AllProductsListAdapter
 import net.store.divineit.ui.base.BaseActivity
 import net.store.divineit.ui.login.LoginActivity
 import net.store.divineit.ui.main.MainActivity
+import net.store.divineit.ui.my_quotations.MyQuotationsActivity
 
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
@@ -75,6 +76,11 @@ class HomeActivity : BaseActivity<HomeActivityBinding, HomeViewModel>() {
             R.id.logout -> {
                 preferencesHelper.logoutUser()
                 invalidateOptionsMenu()
+                true
+            }
+            R.id.myQuotations -> {
+                startActivity(Intent(this@HomeActivity, MyQuotationsActivity::class.java))
+                overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
                 true
             }
             else -> {

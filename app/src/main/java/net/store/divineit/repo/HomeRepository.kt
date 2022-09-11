@@ -38,4 +38,32 @@ class HomeRepository @Inject constructor(
             apiService.productDetails(jsonObject)
         }
     }
+
+    suspend fun myQuotations(email: String): Response<QuotationListResponse> {
+        val jsonObject = JsonObject().apply {
+            addProperty("email", email)
+        }.toString()
+
+        return withContext(Dispatchers.IO) {
+            apiService.myQuotations(1, jsonObject)
+        }
+    }
+
+    suspend fun quotationDetails(quotationId: String): Response<QuotationDetailsResponse> {
+        val jsonObject = JsonObject().apply {
+            addProperty("quotationid", quotationId)
+        }.toString()
+
+        return withContext(Dispatchers.IO) {
+            apiService.quotationDetails(jsonObject)
+        }
+    }
+
+    suspend fun quotationUpdate(summaryUpdateBody: SummaryResponseQuotation): Response<QuotationUpdateResponse> {
+        val jsonObject = Gson().toJson(summaryUpdateBody)
+
+        return withContext(Dispatchers.IO) {
+            apiService.quotationUpdate(jsonObject)
+        }
+    }
 }

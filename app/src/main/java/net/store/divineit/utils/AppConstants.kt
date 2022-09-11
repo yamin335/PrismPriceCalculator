@@ -19,4 +19,8 @@ object AppConstants {
     const val additionalUsers = 5
 
     const val labelCustom = "Custom"
+
+    const val KEY_IS_DETAILS = "is_details"
+    const val KEY_PRODUCT_ID = "product_id"
+    const val KEY_QUOTATION_ID = "quotation_id"
 }

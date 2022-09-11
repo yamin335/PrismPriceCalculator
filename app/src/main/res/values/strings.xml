@@ -13,4 +13,17 @@
     <string name="commonErrorMessage">Something wrong! please try again later</string>
     <string name="internet_error_msg">Please check Your internet connection!</string>
     <string name="logout">Log Out</string>
+    <string name="my_quotations">My Quotations</string>
+    <string name="quotation_id">Quotation ID</string>
+    <string name="n_a">N/A</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
+    <string name="product_id">Product ID</string>
+    <string name="customer">Customer</string>
+    <string name="company">Company</string>
+    <string name="status">Status</string>
+    <string name="bdt">BDT</string>
+    <string name="discount">Discount</string>
+    <string name="total_cost">Total Cost</string>
+    <string name="id">ID</string>
 </resources>

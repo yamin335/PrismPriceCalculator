@@ -63,7 +63,8 @@ data class MultiplierClass (
     val slabs: List<String>,
     val slabTexts: List<String>,
     var slabIndex: Int = 0,
-    var customValue: String? = ""
+    var customValue: String? = "",
+    var slabLabels: List<String> = ArrayList()
 )
 
 data class SlabConfig (

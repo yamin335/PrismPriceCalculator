@@ -20,7 +20,9 @@ import net.store.divineit.utils.AppConstants
 
 class MultiplierListAdapter internal constructor(
     private val callback: (Int, String, Int, String, String?) -> Unit,
-    private val sliderCallback: (String, Int, String?) -> Unit
+    private val sliderCallback: (String, Int, String?) -> Unit,
+    private var costSoftwareCustomization: Int,
+    private var costCustomizedReport: Int
 ) : RecyclerView.Adapter<MultiplierListAdapter.ViewHolder>() {
 
     private var baseModuleCode: String? = ""
@@ -39,7 +41,9 @@ class MultiplierListAdapter internal constructor(
         return dataList.size
     }
 
-    fun submitList(dataList: List<MultiplierClass>, baseModuleCode: String?) {
+    fun submitList(dataList: List<MultiplierClass>, baseModuleCode: String?, costSoftwareCustomization: Int, costCustomizedReport: Int) {
+        this.costSoftwareCustomization = costSoftwareCustomization
+        this.costCustomizedReport = costCustomizedReport
         this.baseModuleCode = baseModuleCode
         this.dataList = dataList  as ArrayList<MultiplierClass>
         notifyDataSetChanged()
@@ -75,67 +79,80 @@ class MultiplierListAdapter internal constructor(
 
                 binding.slider.stepSize = sliderStepSize.toFloat()
 
+                when (item.code) {
+                    "custom" -> {
+                        binding.slider.value = (costSoftwareCustomization / AppConstants.unitPriceSoftwareCustomization).toFloat()
+                    }
+
+                    "report" -> {
+                        binding.slider.value = (costCustomizedReport / AppConstants.unitPriceCustomizedReports).toFloat()
+                    }
+                }
+
                 binding.slider.addOnChangeListener { slider, value, fromUser -> /* `value` is the argument you need */
                     sliderCallback(item.code ?: "", value.toInt(), baseModuleCode)
                 }
             } else {
                 binding.slider.visibility = View.GONE
-                for ((index, slab) in item.slabs.withIndex()) {
-                    val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
-                    if (isNumber) {
-                        if (item.slabConfig?.showRange == true) {
-                            var prefix = ""
-                            if (item.slabTexts.size > index) {
-                                prefix = item.slabTexts[index]
-                            }
-
-                            val increment = 1
-                            var startItem = increment
-
-                            if (index > 0) {
-                                try {
-                                    val previousItem = item.slabs[index - 1].toDouble().toInt()
-                                    startItem = previousItem + increment
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-
-                            try {
-                                val slabPrice = slab.toDouble().toInt()
-                                val slabText = if (prefix.isBlank()) {
-                                    "$startItem-${slabPrice}"
-                                } else {
-                                    "$prefix($startItem-${slabPrice})"
-                                }
-                                binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
-                            }
-                        } else {
-                            var prefix = ""
-                            if (item.slabTexts.size > index) {
-                                prefix = item.slabTexts[index]
-                            }
-
-                            try {
-                                val slabPrice = slab.toDouble().toInt()
-                                val slabText = if (prefix.isBlank()) {
-                                    "$slabPrice"
-                                } else {
-                                    "$prefix(${slabPrice})"
-                                }
-                                binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
-                            }
-                        }
-                    } else {
-                        binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
-                    }
+                for ((index, slabLabel) in item.slabLabels.withIndex()) {
+                    binding.chipGroup.addView(createTagChip(mContext, index, slabLabel, item.slabIndex), index)
                 }
+//                for ((index, slab) in item.slabs.withIndex()) {
+//                    val isNumber = slab.matches("((\\d+\\.?)*\\d*)".toRegex())
+//                    if (isNumber) {
+//                        if (item.slabConfig?.showRange == true) {
+//                            var prefix = ""
+//                            if (item.slabTexts.size > index) {
+//                                prefix = item.slabTexts[index]
+//                            }
+//
+//                            val increment = 1
+//                            var startItem = increment
+//
+//                            if (index > 0) {
+//                                try {
+//                                    val previousItem = item.slabs[index - 1].toDouble().toInt()
+//                                    startItem = previousItem + increment
+//                                } catch (e: Exception) {
+//                                    e.printStackTrace()
+//                                }
+//                            }
+//
+//                            try {
+//                                val slabPrice = slab.toDouble().toInt()
+//                                val slabText = if (prefix.isBlank()) {
+//                                    "$startItem-${slabPrice}"
+//                                } else {
+//                                    "$prefix($startItem-${slabPrice})"
+//                                }
+//                                binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
+//                            } catch (e: Exception) {
+//                                e.printStackTrace()
+//                                binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
+//                            }
+//                        } else {
+//                            var prefix = ""
+//                            if (item.slabTexts.size > index) {
+//                                prefix = item.slabTexts[index]
+//                            }
+//
+//                            try {
+//                                val slabPrice = slab.toDouble().toInt()
+//                                val slabText = if (prefix.isBlank()) {
+//                                    "$slabPrice"
+//                                } else {
+//                                    "$prefix(${slabPrice})"
+//                                }
+//                                binding.chipGroup.addView(createTagChip(mContext, index, slabText, item.slabIndex), index)
+//                            } catch (e: Exception) {
+//                                e.printStackTrace()
+//                                binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
+//                            }
+//                        }
+//                    } else {
+//                        binding.chipGroup.addView(createTagChip(mContext, index, slab, item.slabIndex), index)
+//                    }
+//                }
 
                 if (item.slabConfig?.customUser == true) {
                     binding.chipGroup.addView(createTagChip(mContext, item.slabs.size, AppConstants.labelCustom,

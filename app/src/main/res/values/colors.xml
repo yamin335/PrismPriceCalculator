@@ -13,6 +13,7 @@
 
     // Theme Color
     <color name="themeColor">#4F94F8</color>
+    <color name="themeBgColor">#F2F2F2</color>
 
     // Gray
     <color name="gray1">#F7F7F7</color>

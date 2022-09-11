@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <data class="HomeActivityBinding">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data class="MyQuotationsActivityBinding">
         <variable
             name="viewModel"
-            type="net.store.divineit.ui.home.HomeViewModel" />
+            type="net.store.divineit.ui.my_quotations.MyQuotationsViewModel" />
     </data>
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".ui.home.HomeActivity">
+        android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout"
@@ -52,12 +50,13 @@
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerService"
+            android:id="@+id/recyclerQuotations"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:clipToPadding="false"
             android:paddingTop="8dp"
-            android:paddingBottom="32dp"
+            android:paddingBottom="8dp"
+            android:background="@color/themeBgColor"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
