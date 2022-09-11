@@ -87,6 +87,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainActivityViewModel>() 
 
             if (viewModel.baseModuleList[selectedBaseModulePosition].multipliers[position].slabs.size == index) {
                 calculateModuleAndFeaturePrice(-1, multiplierCode, customValue)
+                calculateSummary()
             } else {
                 calculateModuleAndFeaturePrice(index, multiplierCode, customValue)
                 calculateSummary()
