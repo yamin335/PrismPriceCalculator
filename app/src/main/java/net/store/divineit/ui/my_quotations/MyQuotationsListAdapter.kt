@@ -49,15 +49,13 @@ class MyQuotationsListAdapter internal constructor(
                 ""
             } else {
                 var dateString: String = item.date
-                val date = DateFormatterUtils.formatDateFromString(dateString, DateFormat.format1)
+                var timeString = "N/A"
+                val date = DateFormatterUtils.formatDateFromString(dateString, DateFormat.dateTimeFormat1)
                 date?.let {
-                    dateString = DateFormatterUtils.formatDateToString(it, DateFormat.format2) ?: ""
-                    val dateTime = dateString.split(" ")
-                    if (dateTime.size == 2) {
-                        dateString = "${dateTime[0]}\n${binding.root.context.getString(R.string.time)}:${dateTime[1]}"
-                    }
+                    dateString = DateFormatterUtils.formatDateToString(it, DateFormat.dateFormat1) ?: "N/A"
+                    timeString = DateFormatterUtils.formatDateToString(it, DateFormat.timeFormat1) ?: "N/A"
                 }
-                "${binding.root.context.getString(R.string.date)}: $dateString"
+                "${binding.root.context.getString(R.string.date)}: $dateString\n${binding.root.context.getString(R.string.time)}: $timeString"
             }
 
             binding.productId.text = if (item.productid.isNullOrBlank()) {
